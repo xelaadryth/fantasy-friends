@@ -10,7 +10,6 @@ ADD alpine_binary /app/alpine_binary
 # Add file dependencies
 ADD static /app/static
 ADD templates /app/templates
-ADD private.json /app/private.json
 
 # Run the web server
 WORKDIR /app/
