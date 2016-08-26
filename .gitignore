@@ -1,0 +1,5 @@
+# Intermediate Docker files
+alpine_binary
+
+# Private data that should not be shared
+private.json

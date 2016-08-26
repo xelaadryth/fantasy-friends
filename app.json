@@ -1,0 +1,13 @@
+{
+  "name": "Fantasy Friends",
+  "description": "League of Legends Fantasy game.",
+  "keywords": [
+    "league",
+	"legends",
+	"fantasy",
+	"game",
+	"go"
+  ],
+  "website": "https://fantasy-friends.herokuapp.com/",
+  "repository": "https://github.com/xelaadryth/fantasy-friends"
+}
