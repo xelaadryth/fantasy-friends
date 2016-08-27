@@ -13,9 +13,17 @@
       <a type="button" class="btn btn-lg btn-default" href="https://devcenter.heroku.com/articles/getting-started-with-go"><span class="glyphiconglyphicon-flash"></span> Getting Started with Go</a>
       <a type="button" class="btn btn-lg btn-primary" href="https://github.com/heroku/go-getting-started"><span class="glyphiconglyphicon-download"></span> Source on GitHub</a>
       <p></p>
-      <form id="queryForm" action="/summoner" method="post">
-        Summoner Name: <input id="summonerForm" name="summonerName"></input>
-        <input type="submit" value="Submit" />
+      <form id="queryForm" action="/matchResults" method="post">
+        <p>Region: <input name="region" value="na"></input></p>
+        <table>
+          <th>Order</th><th>Chaos</th>
+          <tr><td><input name="orderTop"></input></td><td><input name="chaosTop"></input></td></tr>
+          <tr><td><input name="orderJungle"></input></td><td><input name="chaosJungle"></input></td></tr>
+          <tr><td><input name="orderMid"></input></td><td><input name="chaosMid"></input></td></tr>
+          <tr><td><input name="orderBottom"></input></td><td><input name="chaosBottom"></input></td></tr>
+          <tr><td><input name="orderSupport"></input></td><td><input name="chaosSupport"></input></td></tr>
+        </table>
+        <input type="submit" value="Submit">
       </form>
   </div>
 </div>
