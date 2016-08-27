@@ -3,6 +3,7 @@ package fantasy
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -11,6 +12,12 @@ import (
 
 //RankedPrefix is a prefix used for all ranked queues for Game.SubType
 const RankedPrefix = "RANKED_"
+
+//Used to identify the teams
+const (
+	Order = "ORDER"
+	Chaos = "CHAOS"
+)
 
 //PlayerScore tracks the points scored for each different kind of point event
 type PlayerScore struct {
@@ -22,7 +29,24 @@ type PlayerScore struct {
 	TripleKills float32
 	QuadraKills float32
 	Pentakills  float32
-	Total       float32
+	Score       float32
+}
+
+//TeamScore has scores for the team and each team member
+type TeamScore struct {
+	Top     PlayerScore
+	Jungle  PlayerScore
+	Mid     PlayerScore
+	Bottom  PlayerScore
+	Support PlayerScore
+	Score   float32
+}
+
+//MatchScore contains the subtotal and total fantasy points for a match
+type MatchScore struct {
+	Order  TeamScore
+	Chaos  TeamScore
+	Winner string
 }
 
 //CreatePlayerScore uses basic information to construct a PlayerScore object
@@ -41,7 +65,7 @@ func CreatePlayerScore(kills int, deaths int, assists int, cs int, tripleKills i
 		score.TenKA = PointValues[TenKAString]
 	}
 
-	score.Total = score.Kills + score.Deaths + score.Assists + score.CS + score.TenKA + score.TripleKills +
+	score.Score = score.Kills + score.Deaths + score.Assists + score.CS + score.TenKA + score.TripleKills +
 		score.QuadraKills + score.Pentakills
 
 	return score
@@ -54,24 +78,36 @@ func PlayerScoreFromGame(stats goriot.GameStat) PlayerScore {
 }
 
 //CalculateScores returns a score map for each summonerID passed in
-func CalculateScores(region string, summonerIDs []int64) ([]PlayerScore, error) {
-	scores := make([]PlayerScore, len(summonerIDs), len(summonerIDs))
+func CalculateScores(region string, summonerIDs []int64) (MatchScore, error) {
+	playerScores := make([]PlayerScore, len(summonerIDs), len(summonerIDs))
 	for i := 0; i < len(summonerIDs); i++ {
-		fmt.Println("Player", i)
+		log.Println(i+1, "- summonerID", summonerIDs[i])
 		games, err := goriot.RecentGameBySummoner(region, summonerIDs[i])
 		time.Sleep(2 * time.Second)
 		if err != nil {
-			return scores, err
+			return MatchScore{}, err
 		}
 		if len(games) == 0 {
-			return scores, errors.New(fmt.Sprint("No games in history for summonerID ", summonerIDs[i]))
+			return MatchScore{}, errors.New(fmt.Sprint("No games in history for summonerID ", summonerIDs[i]))
 		}
 
 		for j := len(games) - 1; j >= 0; j-- {
 			if !games[j].Invalid && strings.HasPrefix(games[j].SubType, RankedPrefix) {
-				scores[i] = PlayerScoreFromGame(games[j].Statistics)
+				playerScores[i] = PlayerScoreFromGame(games[j].Statistics)
 			}
 		}
 	}
-	return scores, nil
+
+	//TODO: Split this function into helper methods
+	orderScore := TeamScore{Top: playerScores[0], Jungle: playerScores[1], Mid: playerScores[2], Bottom: playerScores[3], Support: playerScores[4], Score: playerScores[0].Score + playerScores[1].Score + playerScores[2].Score + playerScores[3].Score + playerScores[4].Score}
+	chaosScore := TeamScore{Top: playerScores[5], Jungle: playerScores[6], Mid: playerScores[7], Bottom: playerScores[8], Support: playerScores[9], Score: playerScores[5].Score + playerScores[6].Score + playerScores[7].Score + playerScores[8].Score + playerScores[9].Score}
+	matchScore := MatchScore{Order: orderScore, Chaos: chaosScore}
+
+	if orderScore.Score > chaosScore.Score {
+		matchScore.Winner = Order
+	} else if chaosScore.Score > orderScore.Score {
+		matchScore.Winner = Chaos
+	}
+
+	return matchScore, nil
 }
