@@ -26,5 +26,7 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
+	database.PreparePepper()
+
 	controller.Route()
 }

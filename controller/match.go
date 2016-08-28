@@ -1,6 +1,5 @@
 package controller
 
-//PlayMatch runs a match from TODO: Split this into controller and fantasy
 import (
 	"net/http"
 
