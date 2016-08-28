@@ -1,0 +1,27 @@
+<html>
+  {{template "header.tmpl"}}
+<body>
+  {{template "nav.tmpl"}}
+
+	<div class="jumbotron text-center">
+    <div class="container">
+      <h2>Login</h2>
+      <form id="queryForm" action="/login" method="post" class="form-horizontal">
+        <div class="form-group">
+          <label for="username" class="control-label col-sm-4">Username:</label>
+          <div class="col-sm-6">
+            <input type="text" name="username" id="username" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="password" class="control-label col-sm-4">Password:</label>
+          <div class="col-sm-6">
+            <input type="password" name="password" id="password" class="form-control" >
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

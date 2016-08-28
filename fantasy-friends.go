@@ -7,6 +7,7 @@ import (
 
 	"github.com/TrevorSStone/goriot"
 	"github.com/xelaadryth/fantasy-friends/controller"
+	"github.com/xelaadryth/fantasy-friends/database"
 )
 
 func main() {
@@ -18,6 +19,14 @@ func main() {
 	goriot.SetAPIKey(riotAPIKey)
 	goriot.SetSmallRateLimit(10, 10*time.Second)
 	goriot.SetLongRateLimit(500, 10*time.Minute)
+
+	//Set up DB
+	err := database.Connect()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	database.PreparePepper()
 
 	controller.Route()
 }
