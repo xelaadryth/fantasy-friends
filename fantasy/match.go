@@ -32,7 +32,7 @@ func PlayMatch(region string, inputSummonerNames ...string) (MatchScore, error) 
 	for i := 0; i < PlayersPerMatch; i++ {
 		summoners[i] = summonersMap[summonerNames[i]]
 	}
-	matchScore, err := CalculateScores(region, summoners)
+	matchScore, err := CalculateMatchScore(region, summoners)
 	if err != nil {
 		return MatchScore{}, err
 	}

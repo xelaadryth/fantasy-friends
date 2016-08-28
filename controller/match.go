@@ -56,7 +56,6 @@ func playMatch(c *gin.Context) {
 		return
 	}
 
-	//TODO: Figure out a way to round floats to 2 decimal places
 	c.HTML(http.StatusOK, "match.tmpl", gin.H{
 		"matchScore": matchScore,
 	})
