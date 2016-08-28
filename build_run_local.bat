@@ -1,4 +1,5 @@
-::Build statically-linked binary for alpine linux
+::Build statically-linked binary for Windows
+del windows_binary.exe
 set GOOS=windows
 set GOARCH=amd64
 for /F "tokens=*" %%A in (.env) do set %%A
