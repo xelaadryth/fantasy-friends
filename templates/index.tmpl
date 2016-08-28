@@ -1,7 +1,7 @@
 <html>
-  {{template "header.tmpl.html"}}
+  {{template "header.tmpl"}}
 <body>
-  {{template "nav.tmpl.html"}}
+  {{template "nav.tmpl"}}
 
   <div class="jumbotron text-center">
     <div class="container">
@@ -9,20 +9,20 @@
         <img src="/static/lang-logo.png">
       </a>
       <h1>Fantasy Friends</h1>
-      <p>Duke it out with your friends to see who can draft the best team using people you know -- or even yourselves!</p>
+      <p>Duke it out with your friends to see who can draft the best team using anyone; even yourselves!</p>
       <p></p>
       <form id="queryForm" action="/matchResults" method="post" class="form-horizontal">
         <div class="form-group">
-          <label for="region" class="control-label col-xs-2 col-xs-offset-4">Region</label>
-          <div class="col-xs-1">
+          <label for="region" class="control-label col-xs-6">Region</label>
+          <div class="col-xs-2">
             <input name="region" id="region" class="form-control" value="na">
           </div>
         </div>
         <div class="form-group">
         <table class="table jumbotron table-bordered">
            <colgroup>
-            <col class="order">
-            <col class="chaos">
+            <col class="bgOrder">
+            <col class="bgChaos">
           </colgroup>
           <thead>
             <tr>
@@ -58,6 +58,7 @@
       </form>
     </div>
   </div>
+
   <div class="container">
     <div class="alert alert-info text-center" role="alert">
         To deploy your own copy, and learn the fundamentals of the Heroku platform, head over to the <a href="https://devcenter.heroku.com/articles/getting-started-with-go" class="alert-link">Getting Started with Go on Heroku</a> tutorial.

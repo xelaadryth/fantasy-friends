@@ -24,9 +24,21 @@
   border: 2px solid white; }
 .jumbotron .lang-logo img {
   max-width: 100%; }
-.order {
+.jumbotron table {
+  text-align: center;
+}
+.jumbotron th {
+  text-align: center;
+}
+.bgOrder {
   background: #205094;
 }
-.chaos {
+.bgChaos {
   background: #981d1d;
+}
+.textOrder {
+  color: #40c5e1;
+}
+.textChaos {
+  color: #f80c0c;
 }

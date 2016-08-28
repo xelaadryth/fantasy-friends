@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"time"
 
 	"github.com/TrevorSStone/goriot"
 )
@@ -15,21 +14,22 @@ const RankedPrefix = "RANKED_"
 
 //Used to identify the teams
 const (
-	Order = "ORDER"
-	Chaos = "CHAOS"
+	Order = "Order"
+	Chaos = "Chaos"
 )
 
 //PlayerScore tracks the points scored for each different kind of point event
 type PlayerScore struct {
-	Kills       float32
-	Deaths      float32
-	Assists     float32
-	CS          float32
-	TenKA       float32
-	TripleKills float32
-	QuadraKills float32
-	Pentakills  float32
-	Score       float32
+	SummonerName string
+	Kills        float32
+	Deaths       float32
+	Assists      float32
+	CS           float32
+	TenKA        float32
+	TripleKills  float32
+	QuadraKills  float32
+	Pentakills   float32
+	Score        float32
 }
 
 //TeamScore has scores for the team and each team member
@@ -50,17 +50,19 @@ type MatchScore struct {
 }
 
 //CreatePlayerScore uses basic information to construct a PlayerScore object
-func CreatePlayerScore(kills int, deaths int, assists int, cs int, tripleKills int, quadraKills int, pentaKills int) PlayerScore {
+func CreatePlayerScore(summoner goriot.Summoner, kills int, deaths int, assists int, cs int, tripleKills int, quadraKills int, pentaKills int) PlayerScore {
 	score := PlayerScore{
-		Kills:       float32(kills) * PointValues[KillsString],
-		Deaths:      float32(deaths) * PointValues[DeathsString],
-		Assists:     float32(assists) * PointValues[AssistsString],
-		CS:          float32(cs) * PointValues[CSString],
-		TripleKills: float32(tripleKills) * PointValues[TripleKillsString],
-		QuadraKills: float32(quadraKills) * PointValues[QuadraKillsString],
-		Pentakills:  float32(pentaKills) * PointValues[PentakillsString],
+		SummonerName: summoner.Name,
+		Kills:        float32(kills) * PointValues[KillsString],
+		Deaths:       float32(deaths) * PointValues[DeathsString],
+		Assists:      float32(assists) * PointValues[AssistsString],
+		CS:           float32(cs) * PointValues[CSString],
+		TripleKills:  float32(tripleKills) * PointValues[TripleKillsString],
+		QuadraKills:  float32(quadraKills) * PointValues[QuadraKillsString],
+		Pentakills:   float32(pentaKills) * PointValues[PentakillsString],
 	}
 
+	//Bonus points for getting at least 10 kills/assists in the same game
 	if kills+assists >= 10 {
 		score.TenKA = PointValues[TenKAString]
 	}
@@ -72,37 +74,46 @@ func CreatePlayerScore(kills int, deaths int, assists int, cs int, tripleKills i
 }
 
 //PlayerScoreFromGame calculates a score for a given game
-func PlayerScoreFromGame(stats goriot.GameStat) PlayerScore {
-	return CreatePlayerScore(stats.ChampionsKilled, stats.NumDeaths, stats.Assists, stats.MinionsKilled,
+func PlayerScoreFromGame(summoner goriot.Summoner, stats goriot.GameStat) PlayerScore {
+	return CreatePlayerScore(summoner, stats.ChampionsKilled, stats.NumDeaths, stats.Assists, stats.MinionsKilled,
 		stats.TripleKills, stats.QuadraKills, stats.PentaKills)
 }
 
-//CalculateScores returns a score map for each summonerID passed in
-func CalculateScores(region string, summonerIDs []int64) (MatchScore, error) {
-	playerScores := make([]PlayerScore, len(summonerIDs), len(summonerIDs))
-	for i := 0; i < len(summonerIDs); i++ {
-		log.Println(i+1, "- summonerID", summonerIDs[i])
-		games, err := goriot.RecentGameBySummoner(region, summonerIDs[i])
-		time.Sleep(2 * time.Second)
+//CalculateScores returns a match score for the match played by the summoners passed in
+func CalculateScores(region string, summoners []goriot.Summoner) (MatchScore, error) {
+	//TODO: Split this function into helper methods
+
+	//For each summoner, get the best game they have in their recent history
+	//TODO: Save these games to DB
+	playerScores := make([]PlayerScore, len(summoners), len(summoners))
+	for i := 0; i < len(summoners); i++ {
+		log.Println(i+1, "- summonerID", summoners[i].ID)
+		games, err := goriot.RecentGameBySummoner(region, summoners[i].ID)
 		if err != nil {
 			return MatchScore{}, err
 		}
-		if len(games) == 0 {
-			return MatchScore{}, errors.New(fmt.Sprint("No games in history for summonerID ", summonerIDs[i]))
-		}
 
-		for j := len(games) - 1; j >= 0; j-- {
+		//Find the best ranked game in a list of recent games
+		foundFlag := false
+		for j := 0; j <= len(games); j++ {
 			if !games[j].Invalid && strings.HasPrefix(games[j].SubType, RankedPrefix) {
-				playerScores[i] = PlayerScoreFromGame(games[j].Statistics)
+				playerScores[i] = PlayerScoreFromGame(summoners[i], games[j].Statistics)
+				foundFlag = true
+				break
 			}
+		}
+		if !foundFlag {
+			return MatchScore{}, errors.New(fmt.Sprint("No ranked games found for ", summoners[i]))
 		}
 	}
 
-	//TODO: Split this function into helper methods
+	//Create teams and match score objects
 	orderScore := TeamScore{Top: playerScores[0], Jungle: playerScores[1], Mid: playerScores[2], Bottom: playerScores[3], Support: playerScores[4], Score: playerScores[0].Score + playerScores[1].Score + playerScores[2].Score + playerScores[3].Score + playerScores[4].Score}
 	chaosScore := TeamScore{Top: playerScores[5], Jungle: playerScores[6], Mid: playerScores[7], Bottom: playerScores[8], Support: playerScores[9], Score: playerScores[5].Score + playerScores[6].Score + playerScores[7].Score + playerScores[8].Score + playerScores[9].Score}
 	matchScore := MatchScore{Order: orderScore, Chaos: chaosScore}
 
+	//Pick the winner
+	//TODO: Do this by user-selected team name instead of Order/Chaos
 	if orderScore.Score > chaosScore.Score {
 		matchScore.Winner = Order
 	} else if chaosScore.Score > orderScore.Score {
