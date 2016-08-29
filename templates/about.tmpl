@@ -1,7 +1,9 @@
 <html>
   {{template "header.tmpl"}}
 <body>
-  {{template "nav.tmpl"}}
+  {{with $navActive := "help"}}
+  {{template "nav.tmpl" .}}
+  {{end}}
 
   <div class="jumbotron text-center">
     <div class="container">
