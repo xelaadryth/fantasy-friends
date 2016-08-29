@@ -7,6 +7,16 @@ import (
 	"github.com/jackc/pgx"
 )
 
+/*
+Currently the PostgreSQL database structure looks like so:
+database_name (Database)
+	fantasy_friends (Schema)
+		user_account (Table)
+			id (bigserial - PK)
+			username (varchar(32) - Unique)
+			hash (varchar(64))
+*/
+
 //DBConnectionPool is required for making queries to the DB
 var DBConnectionPool *pgx.ConnPool
 

@@ -26,6 +26,9 @@ func Route() {
 	router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.tmpl", nil)
 	})
+	router.GET("/about", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "about.tmpl", nil)
+	})
 
 	//TODO: Middleware for cookies/sessions
 	//User Accounts ==============================================================================================================
