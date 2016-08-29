@@ -51,7 +51,7 @@
           </tr>
         </table>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Play</button>
       </form>
     </div>
   </div>
@@ -63,7 +63,7 @@
     <hr>
     <div class="row">
       <div class="col-md-6">
-        <h3><span class="glyphicon glyphicon-info-sign"></span> How To Use</h3>
+        <h3><span class="glyphicon glyphicon-info-sign" id="how-to-play"></span> How to Play</h3>
         <ul>
             <li>You enter 10 different summoner names from players on the same region.</li>
             <li>We grab the 10 most recent games for each of those players, and keep only the ranked games.</li>
@@ -74,8 +74,8 @@
       <div class="col-md-6">
         <h3><span class="glyphicon glyphicon-wrench"></span> Next Steps</h3>
         <ul>
-          <li>Cache summoner ID info</li>
           <li>Add user sessions using gin middleware</li>
+          <li>Cache summoner ID info</li>
           <li>Test production PostgreSQL database</li>
           <li>Add persistent team storage for a user's custom team</li>
           <li>Randomize default opponent team</li>
