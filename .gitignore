@@ -1,6 +1,7 @@
 # Built executable files
 alpine_binary
 windows_binary.exe
+windows_binary.exe~
 
 # Environment variables that hold sensitive data that should not be shared
 .env
