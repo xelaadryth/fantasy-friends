@@ -29,15 +29,10 @@ func Route() {
 
 	//TODO: Middleware for cookies/sessions
 	//User Accounts ==============================================================================================================
-	router.GET("/register", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "register.tmpl", nil)
-	})
-	router.POST("/register", register)
-
 	router.GET("/login", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "login.tmpl", nil)
 	})
-	router.POST("/login", login)
+	router.POST("/login", processUser)
 
 	//Fantasy ====================================================================================================================
 	router.POST("/matchResults", playMatch)

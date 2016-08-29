@@ -26,11 +26,7 @@ func playMatch(c *gin.Context) {
 	var matchForm MatchForm
 	err := c.Bind(&matchForm)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": http.StatusBadRequest,
-			"error":  err.Error(),
-			"form":   matchForm,
-		})
+		invalidHandler(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -48,10 +44,7 @@ func playMatch(c *gin.Context) {
 		matchForm.ChaosSupport,
 	)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": http.StatusBadRequest,
-			"error":  err.Error(),
-		})
+		invalidHandler(c, http.StatusBadRequest, err)
 		return
 	}
 
