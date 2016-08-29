@@ -6,157 +6,177 @@
   {{end}}
 
   <div class="jumbotron text-center">
-    <div class="container">
+    <div class="container-fluid">
       <h1>Match Results</h1>
       <p>Winner is team <span class="text{{.matchScore.WinningSide}}">{{.matchScore.WinningSide}}</span>!</p>
-      <table class="table jumbotron table-bordered">
-         <colgroup>
-          <col span=10 class="bgOrder">
-          <col span=10 class="bgChaos">
-        </colgroup>
-        <thead>
+      <div class="col-lg-6">
+        <table class="table jumbotron table-bordered bgOrder text-nowrap">
+          <thead>
+            <tr>
+              <th colspan=10>Order</th>
+            </tr>
+            <tr>
+              <th>Summoner Name</th>
+              <th>K</th>
+              <th>D</th>
+              <th>A</th>
+              <th>CS</th>
+              <th>10KA</th>
+              <th>TK</th>
+              <th>QK</th>
+              <th>PK</th>
+              <th>Total</th>
+            </tr>
+          </thead>
           <tr>
-            <th colspan=10>Order</th>
-            <th colspan=10>Chaos</th>
+            <td>{{.matchScore.Order.Top.SummonerName}}</td>
+            <td>{{.matchScore.Order.Top.Kills}}</td>
+            <td>{{.matchScore.Order.Top.Deaths}}</td>
+            <td>{{.matchScore.Order.Top.Assists}}</td>
+            <td>{{.matchScore.Order.Top.CSString}}</td>
+            <td>{{.matchScore.Order.Top.TenKA}}</td>
+            <td>{{.matchScore.Order.Top.TripleKills}}</td>
+            <td>{{.matchScore.Order.Top.QuadraKills}}</td>
+            <td>{{.matchScore.Order.Top.Pentakills}}</td>
+            <td>{{.matchScore.Order.Top.ScoreString}}</td>
           </tr>
           <tr>
-            <th>Summoner Name</th>
-            <th>K</th>
-            <th>D</th>
-            <th>A</th>
-            <th>CS</th>
-            <th>10+ K/A</th>
-            <th>T.K.</th>
-            <th>Q.K.</th>
-            <th>P.K.</th>
-            <th>Total</th>
-            <th>Summoner Name</th>
-            <th>K</th>
-            <th>D</th>
-            <th>A</th>
-            <th>CS</th>
-            <th>10+ K/A</th>
-            <th>T.K.</th>
-            <th>Q.K.</th>
-            <th>P.K.</th>
-            <th>Total</th>
+            <td>{{.matchScore.Order.Jungle.SummonerName}}</td>
+            <td>{{.matchScore.Order.Jungle.Kills}}</td>
+            <td>{{.matchScore.Order.Jungle.Deaths}}</td>
+            <td>{{.matchScore.Order.Jungle.Assists}}</td>
+            <td>{{.matchScore.Order.Jungle.CSString}}</td>
+            <td>{{.matchScore.Order.Jungle.TenKA}}</td>
+            <td>{{.matchScore.Order.Jungle.TripleKills}}</td>
+            <td>{{.matchScore.Order.Jungle.QuadraKills}}</td>
+            <td>{{.matchScore.Order.Jungle.Pentakills}}</td>
+            <td>{{.matchScore.Order.Jungle.ScoreString}}</td>
           </tr>
-        </thead>
-        <tr>
-          <td>{{.matchScore.Order.Top.SummonerName}}</td>
-          <td>{{.matchScore.Order.Top.Kills}}</td>
-          <td>{{.matchScore.Order.Top.Deaths}}</td>
-          <td>{{.matchScore.Order.Top.Assists}}</td>
-          <td>{{.matchScore.Order.Top.CSString}}</td>
-          <td>{{.matchScore.Order.Top.TenKA}}</td>
-          <td>{{.matchScore.Order.Top.TripleKills}}</td>
-          <td>{{.matchScore.Order.Top.QuadraKills}}</td>
-          <td>{{.matchScore.Order.Top.Pentakills}}</td>
-          <td>{{.matchScore.Order.Top.ScoreString}}</td>
-          <td>{{.matchScore.Chaos.Top.SummonerName}}</td>
-          <td>{{.matchScore.Chaos.Top.Kills}}</td>
-          <td>{{.matchScore.Chaos.Top.Deaths}}</td>
-          <td>{{.matchScore.Chaos.Top.Assists}}</td>
-          <td>{{.matchScore.Chaos.Top.CSString}}</td>
-          <td>{{.matchScore.Chaos.Top.TenKA}}</td>
-          <td>{{.matchScore.Chaos.Top.TripleKills}}</td>
-          <td>{{.matchScore.Chaos.Top.QuadraKills}}</td>
-          <td>{{.matchScore.Chaos.Top.Pentakills}}</td>
-          <td>{{.matchScore.Chaos.Top.ScoreString}}</td>
-        </tr>
-        <tr>
-          <td>{{.matchScore.Order.Jungle.SummonerName}}</td>
-          <td>{{.matchScore.Order.Jungle.Kills}}</td>
-          <td>{{.matchScore.Order.Jungle.Deaths}}</td>
-          <td>{{.matchScore.Order.Jungle.Assists}}</td>
-          <td>{{.matchScore.Order.Jungle.CSString}}</td>
-          <td>{{.matchScore.Order.Jungle.TenKA}}</td>
-          <td>{{.matchScore.Order.Jungle.TripleKills}}</td>
-          <td>{{.matchScore.Order.Jungle.QuadraKills}}</td>
-          <td>{{.matchScore.Order.Jungle.Pentakills}}</td>
-          <td>{{.matchScore.Order.Jungle.ScoreString}}</td>
-          <td>{{.matchScore.Chaos.Jungle.SummonerName}}</td>
-          <td>{{.matchScore.Chaos.Jungle.Kills}}</td>
-          <td>{{.matchScore.Chaos.Jungle.Deaths}}</td>
-          <td>{{.matchScore.Chaos.Jungle.Assists}}</td>
-          <td>{{.matchScore.Chaos.Jungle.CSString}}</td>
-          <td>{{.matchScore.Chaos.Jungle.TenKA}}</td>
-          <td>{{.matchScore.Chaos.Jungle.TripleKills}}</td>
-          <td>{{.matchScore.Chaos.Jungle.QuadraKills}}</td>
-          <td>{{.matchScore.Chaos.Jungle.Pentakills}}</td>
-          <td>{{.matchScore.Chaos.Jungle.ScoreString}}</td>
-        </tr>
-        <tr>
-          <td>{{.matchScore.Order.Mid.SummonerName}}</td>
-          <td>{{.matchScore.Order.Mid.Kills}}</td>
-          <td>{{.matchScore.Order.Mid.Deaths}}</td>
-          <td>{{.matchScore.Order.Mid.Assists}}</td>
-          <td>{{.matchScore.Order.Mid.CSString}}</td>
-          <td>{{.matchScore.Order.Mid.TenKA}}</td>
-          <td>{{.matchScore.Order.Mid.TripleKills}}</td>
-          <td>{{.matchScore.Order.Mid.QuadraKills}}</td>
-          <td>{{.matchScore.Order.Mid.Pentakills}}</td>
-          <td>{{.matchScore.Order.Mid.ScoreString}}</td>
-          <td>{{.matchScore.Chaos.Mid.SummonerName}}</td>
-          <td>{{.matchScore.Chaos.Mid.Kills}}</td>
-          <td>{{.matchScore.Chaos.Mid.Deaths}}</td>
-          <td>{{.matchScore.Chaos.Mid.Assists}}</td>
-          <td>{{.matchScore.Chaos.Mid.CSString}}</td>
-          <td>{{.matchScore.Chaos.Mid.TenKA}}</td>
-          <td>{{.matchScore.Chaos.Mid.TripleKills}}</td>
-          <td>{{.matchScore.Chaos.Mid.QuadraKills}}</td>
-          <td>{{.matchScore.Chaos.Mid.Pentakills}}</td>
-          <td>{{.matchScore.Chaos.Mid.ScoreString}}</td>
-        </tr>
-        <tr>
-          <td>{{.matchScore.Order.Bottom.SummonerName}}</td>
-          <td>{{.matchScore.Order.Bottom.Kills}}</td>
-          <td>{{.matchScore.Order.Bottom.Deaths}}</td>
-          <td>{{.matchScore.Order.Bottom.Assists}}</td>
-          <td>{{.matchScore.Order.Bottom.CSString}}</td>
-          <td>{{.matchScore.Order.Bottom.TenKA}}</td>
-          <td>{{.matchScore.Order.Bottom.TripleKills}}</td>
-          <td>{{.matchScore.Order.Bottom.QuadraKills}}</td>
-          <td>{{.matchScore.Order.Bottom.Pentakills}}</td>
-          <td>{{.matchScore.Order.Bottom.ScoreString}}</td>
-          <td>{{.matchScore.Chaos.Bottom.SummonerName}}</td>
-          <td>{{.matchScore.Chaos.Bottom.Kills}}</td>
-          <td>{{.matchScore.Chaos.Bottom.Deaths}}</td>
-          <td>{{.matchScore.Chaos.Bottom.Assists}}</td>
-          <td>{{.matchScore.Chaos.Bottom.CSString}}</td>
-          <td>{{.matchScore.Chaos.Bottom.TenKA}}</td>
-          <td>{{.matchScore.Chaos.Bottom.TripleKills}}</td>
-          <td>{{.matchScore.Chaos.Bottom.QuadraKills}}</td>
-          <td>{{.matchScore.Chaos.Bottom.Pentakills}}</td>
-          <td>{{.matchScore.Chaos.Bottom.ScoreString}}</td>
-        </tr>
-        <tr>
-          <td>{{.matchScore.Order.Support.SummonerName}}</td>
-          <td>{{.matchScore.Order.Support.Kills}}</td>
-          <td>{{.matchScore.Order.Support.Deaths}}</td>
-          <td>{{.matchScore.Order.Support.Assists}}</td>
-          <td>{{.matchScore.Order.Support.CSString}}</td>
-          <td>{{.matchScore.Order.Support.TenKA}}</td>
-          <td>{{.matchScore.Order.Support.TripleKills}}</td>
-          <td>{{.matchScore.Order.Support.QuadraKills}}</td>
-          <td>{{.matchScore.Order.Support.Pentakills}}</td>
-          <td>{{.matchScore.Order.Support.ScoreString}}</td>
-          <td>{{.matchScore.Chaos.Support.SummonerName}}</td>
-          <td>{{.matchScore.Chaos.Support.Kills}}</td>
-          <td>{{.matchScore.Chaos.Support.Deaths}}</td>
-          <td>{{.matchScore.Chaos.Support.Assists}}</td>
-          <td>{{.matchScore.Chaos.Support.CSString}}</td>
-          <td>{{.matchScore.Chaos.Support.TenKA}}</td>
-          <td>{{.matchScore.Chaos.Support.TripleKills}}</td>
-          <td>{{.matchScore.Chaos.Support.QuadraKills}}</td>
-          <td>{{.matchScore.Chaos.Support.Pentakills}}</td>
-          <td>{{.matchScore.Chaos.Support.ScoreString}}</td>
-        </tr>
-        <tr class="text-right">
-          <td colspan=10>{{.matchScore.Order.ScoreString}}</td>
-          <td colspan=10>{{.matchScore.Chaos.ScoreString}}</td>
-        </tr>
-      </table>
+          <tr>
+            <td>{{.matchScore.Order.Mid.SummonerName}}</td>
+            <td>{{.matchScore.Order.Mid.Kills}}</td>
+            <td>{{.matchScore.Order.Mid.Deaths}}</td>
+            <td>{{.matchScore.Order.Mid.Assists}}</td>
+            <td>{{.matchScore.Order.Mid.CSString}}</td>
+            <td>{{.matchScore.Order.Mid.TenKA}}</td>
+            <td>{{.matchScore.Order.Mid.TripleKills}}</td>
+            <td>{{.matchScore.Order.Mid.QuadraKills}}</td>
+            <td>{{.matchScore.Order.Mid.Pentakills}}</td>
+            <td>{{.matchScore.Order.Mid.ScoreString}}</td>
+          </tr>
+          <tr>
+            <td>{{.matchScore.Order.Bottom.SummonerName}}</td>
+            <td>{{.matchScore.Order.Bottom.Kills}}</td>
+            <td>{{.matchScore.Order.Bottom.Deaths}}</td>
+            <td>{{.matchScore.Order.Bottom.Assists}}</td>
+            <td>{{.matchScore.Order.Bottom.CSString}}</td>
+            <td>{{.matchScore.Order.Bottom.TenKA}}</td>
+            <td>{{.matchScore.Order.Bottom.TripleKills}}</td>
+            <td>{{.matchScore.Order.Bottom.QuadraKills}}</td>
+            <td>{{.matchScore.Order.Bottom.Pentakills}}</td>
+            <td>{{.matchScore.Order.Bottom.ScoreString}}</td>
+          </tr>
+          <tr>
+            <td>{{.matchScore.Order.Support.SummonerName}}</td>
+            <td>{{.matchScore.Order.Support.Kills}}</td>
+            <td>{{.matchScore.Order.Support.Deaths}}</td>
+            <td>{{.matchScore.Order.Support.Assists}}</td>
+            <td>{{.matchScore.Order.Support.CSString}}</td>
+            <td>{{.matchScore.Order.Support.TenKA}}</td>
+            <td>{{.matchScore.Order.Support.TripleKills}}</td>
+            <td>{{.matchScore.Order.Support.QuadraKills}}</td>
+            <td>{{.matchScore.Order.Support.Pentakills}}</td>
+            <td>{{.matchScore.Order.Support.ScoreString}}</td>
+          </tr>
+          <tr class="text-right">
+            <td colspan=10>{{.matchScore.Order.ScoreString}}</td>
+          </tr>
+        </table>
+      </div>
+            <div class="col-lg-6">
+        <table class="table jumbotron table-bordered bgChaos">
+          <thead>
+            <tr>
+              <th colspan=10>Chaos</th>
+            </tr>
+            <tr>
+              <th>Summoner Name</th>
+              <th>K</th>
+              <th>D</th>
+              <th>A</th>
+              <th>CS</th>
+              <th>10KA</th>
+              <th>TK</th>
+              <th>QK</th>
+              <th>PK</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tr>
+            <td>{{.matchScore.Chaos.Top.SummonerName}}</td>
+            <td>{{.matchScore.Chaos.Top.Kills}}</td>
+            <td>{{.matchScore.Chaos.Top.Deaths}}</td>
+            <td>{{.matchScore.Chaos.Top.Assists}}</td>
+            <td>{{.matchScore.Chaos.Top.CSString}}</td>
+            <td>{{.matchScore.Chaos.Top.TenKA}}</td>
+            <td>{{.matchScore.Chaos.Top.TripleKills}}</td>
+            <td>{{.matchScore.Chaos.Top.QuadraKills}}</td>
+            <td>{{.matchScore.Chaos.Top.Pentakills}}</td>
+            <td>{{.matchScore.Chaos.Top.ScoreString}}</td>
+          </tr>
+          <tr>
+            <td>{{.matchScore.Chaos.Jungle.SummonerName}}</td>
+            <td>{{.matchScore.Chaos.Jungle.Kills}}</td>
+            <td>{{.matchScore.Chaos.Jungle.Deaths}}</td>
+            <td>{{.matchScore.Chaos.Jungle.Assists}}</td>
+            <td>{{.matchScore.Chaos.Jungle.CSString}}</td>
+            <td>{{.matchScore.Chaos.Jungle.TenKA}}</td>
+            <td>{{.matchScore.Chaos.Jungle.TripleKills}}</td>
+            <td>{{.matchScore.Chaos.Jungle.QuadraKills}}</td>
+            <td>{{.matchScore.Chaos.Jungle.Pentakills}}</td>
+            <td>{{.matchScore.Chaos.Jungle.ScoreString}}</td>
+          </tr>
+          <tr>
+            <td>{{.matchScore.Chaos.Mid.SummonerName}}</td>
+            <td>{{.matchScore.Chaos.Mid.Kills}}</td>
+            <td>{{.matchScore.Chaos.Mid.Deaths}}</td>
+            <td>{{.matchScore.Chaos.Mid.Assists}}</td>
+            <td>{{.matchScore.Chaos.Mid.CSString}}</td>
+            <td>{{.matchScore.Chaos.Mid.TenKA}}</td>
+            <td>{{.matchScore.Chaos.Mid.TripleKills}}</td>
+            <td>{{.matchScore.Chaos.Mid.QuadraKills}}</td>
+            <td>{{.matchScore.Chaos.Mid.Pentakills}}</td>
+            <td>{{.matchScore.Chaos.Mid.ScoreString}}</td>
+          </tr>
+          <tr>
+            <td>{{.matchScore.Chaos.Bottom.SummonerName}}</td>
+            <td>{{.matchScore.Chaos.Bottom.Kills}}</td>
+            <td>{{.matchScore.Chaos.Bottom.Deaths}}</td>
+            <td>{{.matchScore.Chaos.Bottom.Assists}}</td>
+            <td>{{.matchScore.Chaos.Bottom.CSString}}</td>
+            <td>{{.matchScore.Chaos.Bottom.TenKA}}</td>
+            <td>{{.matchScore.Chaos.Bottom.TripleKills}}</td>
+            <td>{{.matchScore.Chaos.Bottom.QuadraKills}}</td>
+            <td>{{.matchScore.Chaos.Bottom.Pentakills}}</td>
+            <td>{{.matchScore.Chaos.Bottom.ScoreString}}</td>
+          </tr>
+          <tr>
+            <td>{{.matchScore.Chaos.Support.SummonerName}}</td>
+            <td>{{.matchScore.Chaos.Support.Kills}}</td>
+            <td>{{.matchScore.Chaos.Support.Deaths}}</td>
+            <td>{{.matchScore.Chaos.Support.Assists}}</td>
+            <td>{{.matchScore.Chaos.Support.CSString}}</td>
+            <td>{{.matchScore.Chaos.Support.TenKA}}</td>
+            <td>{{.matchScore.Chaos.Support.TripleKills}}</td>
+            <td>{{.matchScore.Chaos.Support.QuadraKills}}</td>
+            <td>{{.matchScore.Chaos.Support.Pentakills}}</td>
+            <td>{{.matchScore.Chaos.Support.ScoreString}}</td>
+          </tr>
+          <tr class="text-right">
+            <td colspan=10>{{.matchScore.Chaos.ScoreString}}</td>
+          </tr>
+        </table>
+      </div>
     </div>
   </div>
 </body>
