@@ -11,63 +11,65 @@
       <p>Duke it out with your friends to see who can draft the best team using anyone; even yourselves!</p>
       <form id="queryForm" action="/matchResults" method="post" class="form-horizontal">
         <div class="form-group">
-          <label for="region" class="control-label col-xs-5">Region</label>
-          <div class="col-xs-2">
-            <input name="region" id="region" class="form-control" value="na">
+          <div class="col-md-6">
+            <table class="table jumbotron table-bordered bg-blue-team">
+              <thead>
+                <tr>
+                  <th>Blue</th>
+                </tr>
+              </thead>
+              <tr>
+                <td><input name="blueTeamTop" id="blueTeamTop" class="form-control" placeholder="Top" value="Riot Heartwumbo"></input></td>
+              </tr>
+              <tr>
+                <td><input name="blueTeamJungle" id="blueTeamJungle" class="form-control" placeholder="Jungle" value="Riot Chomey"></input></td>
+              </tr>
+              <tr>
+                <td><input name="blueTeamMid" id="blueTeamMid" class="form-control" placeholder="Mid" value="Riot Xelaadryth"></input></td>
+              </tr>
+              <tr>
+                <td><input name="blueTeamBottom" id="blueTeamBottom" class="form-control" placeholder="Bottom" value="Riot tehleach"></input></td>
+              </tr>
+              <tr>
+                <td><input name="blueTeamSupport" id="blueTeamSupport" class="form-control" placeholder="Support" value="Tainze"></input></td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <table class="table jumbotron table-bordered bg-red-team">
+              <thead>
+                <tr>
+                  <th>Red</th>
+                </tr>
+              </thead>
+              <tr>
+                <td><input name="redTeamTop" id="redTeamTop" class="form-control" placeholder="Top" value="C9 Balls"></input></td>
+              </tr>
+              <tr>
+                <td><input name="redTeamJungle" id="redTeamJungle" class="form-control" placeholder="Jungle" value="C9 Meteos"></input></td>
+              </tr>
+              <tr>
+                <td><input name="redTeamMid" id="redTeamMid" class="form-control" placeholder="Mid" value="Pobelter"></input></td>
+              </tr>
+              <tr>
+                <td><input name="redTeamBottom" id="redTeamBottom" class="form-control" placeholder="Bottom" value="Doublelift"></input></td>
+              </tr>
+              <tr>
+                <td><input name="redTeamSupport" id="redTeamSupport" class="form-control" placeholder="Support" value="Biofrost"></input></td>
+              </tr>
+            </table>
           </div>
         </div>
-        <div class="form-group col-md-6">
-          <table class="table jumbotron table-bordered bgBlueTeam">
-            <thead>
-              <tr>
-                <th>Blue</th>
-              </tr>
-            </thead>
-            <tr>
-              <td><input name="blueTeamTop" id="blueTeamTop" class="form-control" placeholder="Top" value="Riot Heartwumbo"></input></td>
-            </tr>
-            <tr>
-              <td><input name="blueTeamJungle" id="blueTeamJungle" class="form-control" placeholder="Jungle" value="Riot Chomey"></input></td>
-            </tr>
-            <tr>
-              <td><input name="blueTeamMid" id="blueTeamMid" class="form-control" placeholder="Mid" value="Riot Xelaadryth"></input></td>
-            </tr>
-            <tr>
-              <td><input name="blueTeamBottom" id="blueTeamBottom" class="form-control" placeholder="Bottom" value="Riot tehleach"></input></td>
-            </tr>
-            <tr>
-              <td><input name="blueTeamSupport" id="blueTeamSupport" class="form-control" placeholder="Support" value="Tainze"></input></td>
-            </tr>
-          </table>
-        </div>
-        <div class="form-group col-md-6">
-          <table class="table jumbotron table-bordered bgRedTeam">
-            <thead>
-              <tr>
-                <th>Red</th>
-              </tr>
-            </thead>
-            <tr>
-              <td><input name="redTeamTop" id="redTeamTop" class="form-control" placeholder="Top" value="C9 Balls"></input></td>
-            </tr>
-            <tr>
-              <td><input name="redTeamJungle" id="redTeamJungle" class="form-control" placeholder="Jungle" value="C9 Meteos"></input></td>
-            </tr>
-            <tr>
-              <td><input name="redTeamMid" id="redTeamMid" class="form-control" placeholder="Mid" value="Pobelter"></input></td>
-            </tr>
-            <tr>
-              <td><input name="redTeamBottom" id="redTeamBottom" class="form-control" placeholder="Bottom" value="Doublelift"></input></td>
-            </tr>
-            <tr>
-              <td><input name="redTeamSupport" id="redTeamSupport" class="form-control" placeholder="Support" value="Biofrost"></input></td>
-            </tr>
-          </table>
-        </div>
         <div class="form-group row">
-          <div class="col-xs-4 col-xs-offset-4">
-            <button type="submit" class="btn btn-primary">Play</button>
-        </div>
+          <div class="col-sm-1 col-sm-offset-2">
+            <label for="region" class="control-label">Region</label>
+          </div>
+          <div class="col-sm-2">
+            <input name="region" id="region" class="form-control text-center" value="na">
+          </div>
+          <div class="col-sm-5">
+            <button type="submit" class="form-control btn btn-primary">Play</button>
+          </div>
         </div>
       </form>
     </div>

@@ -14,8 +14,8 @@ const RankedPrefix = "RANKED_"
 
 //Used to identify the teams
 const (
-	BlueTeam = "Blue"
-	RedTeam  = "Red"
+	BlueTeam = "blue"
+	RedTeam  = "red"
 )
 
 //PlayerScore tracks the points scored for each different kind of point event
@@ -50,6 +50,7 @@ type MatchScore struct {
 	BlueTeam    TeamScore
 	RedTeam     TeamScore
 	WinningSide string
+	WinningTeam string
 }
 
 //CreatePlayerScore uses basic information to construct a PlayerScore object
@@ -159,8 +160,10 @@ func CalculateMatchScore(region string, summoners []goriot.Summoner) (MatchScore
 	//TODO: Do this by user-selected team name instead of Blue/Red
 	if blueTeamScore.Score > redTeamScore.Score {
 		matchScore.WinningSide = BlueTeam
+		matchScore.WinningTeam = "Blue"
 	} else if redTeamScore.Score > blueTeamScore.Score {
 		matchScore.WinningSide = RedTeam
+		matchScore.WinningTeam = "Red"
 	}
 
 	return matchScore, nil
