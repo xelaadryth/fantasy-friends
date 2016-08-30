@@ -19,16 +19,16 @@ table {
 th {
   text-align: center;
 }
-.bgOrder {
+.bgBlueTeam {
   background: #205094;
 }
-.bgChaos {
+.bgRedTeam {
   background: #981d1d;
 }
-.textOrder {
+.textBlueTeam {
   color: #40c5e1;
 }
-.textChaos {
+.textRedTeam {
   color: #f80c0c;
 }
 h1 {
