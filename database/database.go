@@ -9,12 +9,21 @@ import (
 
 /*
 Currently the PostgreSQL database structure looks like so:
+
 database_name (Database)
 	fantasy_friends (Schema)
 		user_account (Table)
-			id (bigserial - PK)
-			username (varchar(32) - Unique)
-			hash (varchar(64))
+			id (bigserial - PK, NN)
+			username (varchar(32) - Unique, NN)
+			hash (varchar(64) - NN)
+		summoner_cache (Table)
+			id (bigint - NN)
+			summoner_name (varchar(32) - NN)
+			summoner_level (int - NN)
+			profile_icon_id (int - NN)
+			revision_date (bigint - NN)
+			normalized_name (varchar(32) - PK, NN)
+			region (varchar(8) - NN)
 */
 
 //DBConnectionPool is required for making queries to the DB
@@ -26,26 +35,19 @@ const MaxDBConnections = 5
 //DBTimeout in seconds
 const DBTimeout = 30 * time.Second
 
-//Queries that are prepared for easy calling
-const (
-	QueryGetUserAccountByUsername = "getUserAccount"
-	QueryPutUserAccount           = "putUserAccount"
-)
-
 // afterConnect creates the prepared statements that this application uses
-func afterConnect(conn *pgx.Conn) (err error) {
-	_, err = conn.Prepare(QueryGetUserAccountByUsername, `
-    SELECT id, hash FROM fantasy_friends.user_account WHERE username=$1
-  `)
+func afterConnect(conn *pgx.Conn) error {
+	err := prepareUserStatements(conn)
 	if err != nil {
-		return
+		return err
 	}
 
-	_, err = conn.Prepare(QueryPutUserAccount, `
-    INSERT INTO fantasy_friends.user_account(username, hash)
-    VALUES ($1, $2)
-  `)
-	return
+	err = prepareRiotStatements(conn)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 //Connect to the database

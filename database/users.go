@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jackc/pgx"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -14,6 +16,12 @@ const BcryptCost = 13
 
 //pepper is a fixed series of random characters that is concatenated to the end of passwords before hashing
 var pepper string
+
+//Queries that are prepared for easy calling
+const (
+	QueryGetUserAccountByUsername = "getUserAccount"
+	QueryPutUserAccount           = "putUserAccount"
+)
 
 //Login a user account from the db
 func Login(username string, password string) error {
@@ -62,7 +70,27 @@ func Register(username string, password string) error {
 func PreparePepper() error {
 	pepper = os.Getenv("PEPPER")
 	if pepper == "" {
-		return errors.New("$PEPPER must be set")
+		return errors.New("$PEPPER must be set (to anything)")
+	}
+
+	return nil
+}
+
+// prepareUserStatements readies SQL queries for later use
+func prepareUserStatements(conn *pgx.Conn) error {
+	_, err := conn.Prepare(QueryGetUserAccountByUsername, `
+    SELECT id, hash FROM fantasy_friends.user_account WHERE username=$1
+  `)
+	if err != nil {
+		return err
+	}
+
+	_, err = conn.Prepare(QueryPutUserAccount, `
+    INSERT INTO fantasy_friends.user_account (username, hash)
+    VALUES ($1, $2)
+  `)
+	if err != nil {
+		return err
 	}
 
 	return nil
