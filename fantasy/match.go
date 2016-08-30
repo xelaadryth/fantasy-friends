@@ -3,28 +3,58 @@ package fantasy
 import (
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/TrevorSStone/goriot"
+	"github.com/xelaadryth/fantasy-friends/database"
 )
 
-//PlayMatch runs a Fantasy match between the summoners provided
-func PlayMatch(region string, inputSummonerNames ...string) (MatchScore, error) {
-	summonerNames := goriot.NormalizeSummonerName(inputSummonerNames...)
-	if len(summonerNames) != PlayersPerMatch {
-		return MatchScore{}, errors.New(
-			fmt.Sprint("Provided ", len(summonerNames), "summoners instead of ", PlayersPerMatch, "."))
+//attemptUncacheSummoners tries to retrieve all summoner IDs from cache if possible
+func attemptUncacheSummoners(region string, normalizedSummonerNames ...string) (summoners map[string]goriot.Summoner, err error) {
+	summoners = make(map[string]goriot.Summoner)
+
+	for _, normalizedSummonerName := range normalizedSummonerNames {
+		summoners[normalizedSummonerName], err = database.UncacheSummoner(region, normalizedSummonerName)
+		if err != nil {
+			return summoners, err
+		}
 	}
 
-	//Attempt to get the summoner IDs
-	summonersMap, err := goriot.SummonerByName(region, summonerNames...)
+	return summoners, err
+}
+
+//PlayMatch runs a Fantasy match between the summoners provided
+func PlayMatch(region string, inputSummonerNames ...string) (matchScore MatchScore, err error) {
+	summonerNames := goriot.NormalizeSummonerName(inputSummonerNames...)
+	if len(summonerNames) != PlayersPerMatch {
+		err = errors.New(fmt.Sprint("Provided ", len(summonerNames), "summoners instead of ", PlayersPerMatch, "."))
+		return matchScore, err
+	}
+
+	//Attempt to get Summoner objects for each normalized summoner name
+	//TODO: Invalidate these based on revision date in case of name changes, or even better when idle
+	summonersMap, err := attemptUncacheSummoners(region, summonerNames...)
 	if err != nil {
-		return MatchScore{}, err
+		//If we can't, then query the Riot API for the summoner IDs
+		summonersMap, err = goriot.SummonerByName(region, summonerNames...)
+		if err != nil {
+			return matchScore, err
+		}
+
+		//Insert the results of the fresh queries into the summoner cache
+		for normalizedName, summoner := range summonersMap {
+			cacheErr := database.CacheSummoner(region, normalizedName, summoner)
+			if cacheErr != nil {
+				log.Println("Failed to cache summoner", normalizedName, summoner, "with error", cacheErr)
+			}
+		}
 	}
 	//Make sure the names are unique
 	if len(summonersMap) != PlayersPerMatch {
-		return MatchScore{}, errors.New(
+		err = errors.New(
 			fmt.Sprint("Only ", len(summonersMap), " valid distinct summoner names instead of ",
 				PlayersPerMatch, "."))
+		return matchScore, err
 	}
 
 	//Make a data structure with all the player IDs
@@ -32,10 +62,5 @@ func PlayMatch(region string, inputSummonerNames ...string) (MatchScore, error) 
 	for i := 0; i < PlayersPerMatch; i++ {
 		summoners[i] = summonersMap[summonerNames[i]]
 	}
-	matchScore, err := CalculateMatchScore(region, summoners)
-	if err != nil {
-		return MatchScore{}, err
-	}
-
-	return matchScore, nil
+	return CalculateMatchScore(region, summoners)
 }
