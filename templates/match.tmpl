@@ -8,9 +8,9 @@
   <div class="jumbotron text-center">
     <div class="container-fluid">
       <h1>Match Results</h1>
-      <p>Winner is <span class="text{{.matchScore.WinningSide}}Team">{{.matchScore.WinningSide}}</span> team!</p>
+      <p>Winner is team <span class="text-{{.matchScore.WinningSide}}-team">{{.matchScore.WinningTeam}}</span>!</p>
       <div class="col-lg-6">
-        <table class="table jumbotron table-bordered bgBlueTeam text-nowrap">
+        <table class="table jumbotron table-bordered bg-blue-team text-nowrap">
           <thead>
             <tr>
               <th colspan=10>Blue</th>
@@ -94,7 +94,7 @@
         </table>
       </div>
             <div class="col-lg-6">
-        <table class="table jumbotron table-bordered bgRedTeam">
+        <table class="table jumbotron table-bordered bg-red-team">
           <thead>
             <tr>
               <th colspan=10>Red</th>

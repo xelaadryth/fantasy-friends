@@ -1,14 +1,19 @@
 .jumbotron {
-  background: #472C76;
-  color: #EDE6F4;
+  background: #472c76;
+  color: #ede6f4;
   padding-bottom: 80px; }
+.jumbotron .btn {
+  background: #5317ba;
+  border-color: #2e007e; }
+.jumbotron .btn:hover {
+  background:#6532bd; }
 .jumbotron .btn-primary {
-  background: #5317BA;
-  border-color: #2E007E; }
+  background: #3035ef;
+  border-color: #0c10a3; }
 .jumbotron .btn-primary:hover {
-  background:#6532BD; }
+  background:#6568f3; }
 .jumbotron p {
-  color: #C6B6D6;
+  color: #c6b6d6;
   max-width: 75%;
   margin: 1em auto 2em; }
 .navbar + .jumbotron {
@@ -19,16 +24,16 @@ table {
 th {
   text-align: center;
 }
-.bgBlueTeam {
+.bg-blue-team {
   background: #205094;
 }
-.bgRedTeam {
+.bg-red-team {
   background: #981d1d;
 }
-.textBlueTeam {
+.text-blue-team {
   color: #40c5e1;
 }
-.textRedTeam {
+.text-red-team {
   color: #f80c0c;
 }
 h1 {

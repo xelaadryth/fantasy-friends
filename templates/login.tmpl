@@ -10,20 +10,22 @@
       <h2>Login / Registration</h2>
       <form id="queryForm" action="/login" method="post" class="form-horizontal">
         <div class="row form-group">
-          <label for="username" class="control-label col-xs-5">Username:</label>
+          <label for="username" class="control-label col-xs-3 col-xs-offset-1">Username:</label>
           <div class="col-xs-5">
             <input type="text" name="username" id="username" class="form-control">
           </div>
         </div>
         <div class="row form-group">
-          <label for="password" class="control-label col-xs-5">Password:</label>
+          <label for="password" class="control-label col-xs-3 col-xs-offset-1">Password:</label>
           <div class="col-xs-5">
             <input type="password" name="password" id="password" class="form-control" >
           </div>
         </div>
-        <div class="row form-group" overflow="hidden" float="right">
-          <button type="submit" name="action" value="login" class="btn btn-primary col-xs-3 col-xs-offset-3">Login</button>
-          <button type="submit" name="action" value="register" class="btn btn-primary col-xs-3 col-xs-offset-1">Register</button>
+        <div class="form-group form-row">
+          <button type="submit" name="action" value="login" class="btn btn-primary col-xs-2 col-xs-offset-5">Login</button>
+        </div>
+        <div class="form-group form-row">
+          <button type="submit" name="action" value="register" class="btn col-xs-2 col-xs-offset-5">Register</button>
         </div>
       </form>
     </div>
