@@ -9,17 +9,17 @@ import (
 
 //MatchForm input fields required for running a match
 type MatchForm struct {
-	Region       string `form:"region" binding:"required"`
-	OrderTop     string `form:"orderTop" binding:"required"`
-	OrderJungle  string `form:"orderJungle" binding:"required"`
-	OrderMid     string `form:"orderMid" binding:"required"`
-	OrderBottom  string `form:"orderBottom" binding:"required"`
-	OrderSupport string `form:"orderSupport" binding:"required"`
-	ChaosTop     string `form:"chaosTop" binding:"required"`
-	ChaosJungle  string `form:"chaosJungle" binding:"required"`
-	ChaosMid     string `form:"chaosMid" binding:"required"`
-	ChaosBottom  string `form:"chaosBottom" binding:"required"`
-	ChaosSupport string `form:"chaosSupport" binding:"required"`
+	Region          string `form:"region" binding:"required"`
+	BlueTeamTop     string `form:"blueTeamTop" binding:"required"`
+	BlueTeamJungle  string `form:"blueTeamJungle" binding:"required"`
+	BlueTeamMid     string `form:"blueTeamMid" binding:"required"`
+	BlueTeamBottom  string `form:"blueTeamBottom" binding:"required"`
+	BlueTeamSupport string `form:"blueTeamSupport" binding:"required"`
+	RedTeamTop      string `form:"redTeamTop" binding:"required"`
+	RedTeamJungle   string `form:"redTeamJungle" binding:"required"`
+	RedTeamMid      string `form:"redTeamMid" binding:"required"`
+	RedTeamBottom   string `form:"redTeamBottom" binding:"required"`
+	RedTeamSupport  string `form:"redTeamSupport" binding:"required"`
 }
 
 func playMatch(c *gin.Context) {
@@ -32,16 +32,16 @@ func playMatch(c *gin.Context) {
 
 	matchScore, err := fantasy.PlayMatch(
 		matchForm.Region,
-		matchForm.OrderTop,
-		matchForm.OrderJungle,
-		matchForm.OrderMid,
-		matchForm.OrderBottom,
-		matchForm.OrderSupport,
-		matchForm.ChaosTop,
-		matchForm.ChaosJungle,
-		matchForm.ChaosMid,
-		matchForm.ChaosBottom,
-		matchForm.ChaosSupport,
+		matchForm.BlueTeamTop,
+		matchForm.BlueTeamJungle,
+		matchForm.BlueTeamMid,
+		matchForm.BlueTeamBottom,
+		matchForm.BlueTeamSupport,
+		matchForm.RedTeamTop,
+		matchForm.RedTeamJungle,
+		matchForm.RedTeamMid,
+		matchForm.RedTeamBottom,
+		matchForm.RedTeamSupport,
 	)
 	if err != nil {
 		invalidHandler(c, http.StatusBadRequest, err)

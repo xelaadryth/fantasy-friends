@@ -14,8 +14,8 @@ const RankedPrefix = "RANKED_"
 
 //Used to identify the teams
 const (
-	Order = "Order"
-	Chaos = "Chaos"
+	BlueTeam = "Blue"
+	RedTeam  = "Red"
 )
 
 //PlayerScore tracks the points scored for each different kind of point event
@@ -47,8 +47,8 @@ type TeamScore struct {
 
 //MatchScore contains the subtotal and total fantasy points for a match
 type MatchScore struct {
-	Order       TeamScore
-	Chaos       TeamScore
+	BlueTeam    TeamScore
+	RedTeam     TeamScore
 	WinningSide string
 }
 
@@ -132,7 +132,7 @@ func CalculateMatchScore(region string, summoners []goriot.Summoner) (MatchScore
 	}
 
 	//Create teams and match score objects
-	orderScore := TeamScore{
+	blueTeamScore := TeamScore{
 		Top:     playerScores[0],
 		Jungle:  playerScores[1],
 		Mid:     playerScores[2],
@@ -140,8 +140,8 @@ func CalculateMatchScore(region string, summoners []goriot.Summoner) (MatchScore
 		Support: playerScores[4],
 		Score:   playerScores[0].Score + playerScores[1].Score + playerScores[2].Score + playerScores[3].Score + playerScores[4].Score,
 	}
-	orderScore.ScoreString = fmt.Sprintf("%.2f", orderScore.Score)
-	chaosScore := TeamScore{
+	blueTeamScore.ScoreString = fmt.Sprintf("%.2f", blueTeamScore.Score)
+	redTeamScore := TeamScore{
 		Top:     playerScores[5],
 		Jungle:  playerScores[6],
 		Mid:     playerScores[7],
@@ -149,18 +149,18 @@ func CalculateMatchScore(region string, summoners []goriot.Summoner) (MatchScore
 		Support: playerScores[9],
 		Score:   playerScores[5].Score + playerScores[6].Score + playerScores[7].Score + playerScores[8].Score + playerScores[9].Score,
 	}
-	chaosScore.ScoreString = fmt.Sprintf("%.2f", chaosScore.Score)
+	redTeamScore.ScoreString = fmt.Sprintf("%.2f", redTeamScore.Score)
 	matchScore := MatchScore{
-		Order: orderScore,
-		Chaos: chaosScore,
+		BlueTeam: blueTeamScore,
+		RedTeam:  redTeamScore,
 	}
 
 	//Pick the winner
-	//TODO: Do this by user-selected team name instead of Order/Chaos
-	if orderScore.Score > chaosScore.Score {
-		matchScore.WinningSide = Order
-	} else if chaosScore.Score > orderScore.Score {
-		matchScore.WinningSide = Chaos
+	//TODO: Do this by user-selected team name instead of Blue/Red
+	if blueTeamScore.Score > redTeamScore.Score {
+		matchScore.WinningSide = BlueTeam
+	} else if redTeamScore.Score > blueTeamScore.Score {
+		matchScore.WinningSide = RedTeam
 	}
 
 	return matchScore, nil
