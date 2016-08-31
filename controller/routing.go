@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gin-gonic/contrib/secure"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,6 +19,19 @@ func Route() {
 
 	//Set up routing
 	router := gin.Default()
+
+	//Redirect to HTTPS when not in debug mode
+	router.Use(
+		secure.Secure(secure.Options{
+			SSLRedirect:          true,
+			SSLProxyHeaders:      map[string]string{"X-Forwarded-Proto": "https"},
+			STSSeconds:           315360000,
+			STSIncludeSubdomains: true,
+			FrameDeny:            true,
+			ContentTypeNosniff:   true,
+			BrowserXssFilter:     true,
+			IsDevelopment:        gin.IsDebugging(),
+		}))
 
 	router.LoadHTMLGlob("templates/*.tmpl")
 	router.Static("/static", "./static")
