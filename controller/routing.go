@@ -20,7 +20,7 @@ func Route() {
 	router := gin.Default()
 
 	router.LoadHTMLGlob("templates/*.tmpl")
-	router.Static("/static", "static")
+	router.Static("/static", "./static")
 
 	//TODO: Split into routing groups
 	router.GET("/", func(c *gin.Context) {
