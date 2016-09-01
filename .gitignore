@@ -5,3 +5,5 @@ windows_binary.exe~
 
 # Environment variables that hold sensitive data that should not be shared
 .env
+local.env
+prod.env

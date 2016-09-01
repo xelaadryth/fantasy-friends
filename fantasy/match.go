@@ -32,7 +32,7 @@ func PlayMatch(region string, inputSummonerNames ...string) (matchScore MatchSco
 	}
 
 	//Attempt to get Summoner objects for each normalized summoner name
-	//TODO: Invalidate these based on revision date in case of name changes, or even better when idle
+	//TODO: Remove this caching when rate limits are removed
 	summonersMap, err := attemptUncacheSummoners(region, summonerNames...)
 	if err != nil {
 		//If we can't, then query the Riot API for the summoner IDs
