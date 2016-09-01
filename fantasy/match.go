@@ -10,8 +10,9 @@ import (
 )
 
 //attemptUncacheSummoners tries to retrieve all summoner IDs from cache if possible
-func attemptUncacheSummoners(region string, normalizedSummonerNames ...string) (summoners map[string]goriot.Summoner, err error) {
-	summoners = make(map[string]goriot.Summoner)
+func attemptUncacheSummoners(region string, normalizedSummonerNames ...string) (map[string]goriot.Summoner, error) {
+	summoners := make(map[string]goriot.Summoner)
+	var err error
 
 	for _, normalizedSummonerName := range normalizedSummonerNames {
 		summoners[normalizedSummonerName], err = database.UncacheSummoner(region, normalizedSummonerName)
@@ -24,11 +25,11 @@ func attemptUncacheSummoners(region string, normalizedSummonerNames ...string) (
 }
 
 //PlayMatch runs a Fantasy match between the summoners provided
-func PlayMatch(region string, inputSummonerNames ...string) (matchScore MatchScore, err error) {
+func PlayMatch(region string, inputSummonerNames ...string) (MatchScore, error) {
 	summonerNames := goriot.NormalizeSummonerName(inputSummonerNames...)
 	if len(summonerNames) != PlayersPerMatch {
-		err = errors.New(fmt.Sprint("Provided ", len(summonerNames), "summoners instead of ", PlayersPerMatch, "."))
-		return matchScore, err
+		err := errors.New(fmt.Sprint("Provided ", len(summonerNames), "summoners instead of ", PlayersPerMatch, "."))
+		return MatchScore{}, err
 	}
 
 	//Attempt to get Summoner objects for each normalized summoner name
@@ -38,7 +39,7 @@ func PlayMatch(region string, inputSummonerNames ...string) (matchScore MatchSco
 		//If we can't, then query the Riot API for the summoner IDs
 		summonersMap, err = goriot.SummonerByName(region, summonerNames...)
 		if err != nil {
-			return matchScore, err
+			return MatchScore{}, err
 		}
 
 		//Insert the results of the fresh queries into the summoner cache
@@ -54,7 +55,7 @@ func PlayMatch(region string, inputSummonerNames ...string) (matchScore MatchSco
 		err = errors.New(
 			fmt.Sprint("Only ", len(summonersMap), " valid distinct summoner names instead of ",
 				PlayersPerMatch, "."))
-		return matchScore, err
+		return MatchScore{}, err
 	}
 
 	//Make a data structure with all the player IDs

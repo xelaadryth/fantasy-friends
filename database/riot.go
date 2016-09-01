@@ -30,8 +30,8 @@ func CacheSummoner(region string, normalizedName string, summoner goriot.Summone
 	return err
 }
 
-func prepareRiotStatements(conn *pgx.Conn) (err error) {
-	_, err = conn.Prepare(QueryGetSummoner, `
+func prepareRiotStatements(conn *pgx.Conn) error {
+	_, err := conn.Prepare(QueryGetSummoner, `
 		SELECT id, summoner_name, summoner_level, profile_icon_id, revision_date
 		FROM fantasy_friends.summoner_cache
 		WHERE normalized_name=$1 AND region=$2
