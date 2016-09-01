@@ -55,15 +55,15 @@ func AddSession(userID int64) (string, error) {
 //prepareSessionStatements readies SQL queries for later use
 func prepareSessionStatements(conn *pgx.Conn) error {
 	_, err := conn.Prepare(QueryGetSessionUserID, `
-    SELECT user_id FROM fantasy_friends.user_session WHERE id=$1
+		SELECT user_id FROM fantasy_friends.user_session WHERE id=$1
   `)
 	if err != nil {
 		return err
 	}
 
 	_, err = conn.Prepare(QueryPutSession, `
-    INSERT INTO fantasy_friends.user_session (id, user_id, creation_time)
-    VALUES ($1, $2, $3)
+		INSERT INTO fantasy_friends.user_session (id, user_id, creation_time)
+		VALUES ($1, $2, $3)
   `)
 	if err != nil {
 		return err
