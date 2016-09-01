@@ -96,8 +96,8 @@ func PlayerScoreBestRecent(region string, summoner goriot.Summoner) (PlayerScore
 	//Find the best ranked game in a list of recent games
 	playerScores := make([]PlayerScore, len(games), len(games))
 	maxIndex := -1
-	//TODO: See if there's a reasonable definition for a "minimum float32" but probably varies depending on architecture
-	var maxScore float32 = -999999
+	//We should never go lower than this score in a game; definition of a minimum float is iffy
+	var maxScore float32 = -8192
 	for i := 0; i < len(games); i++ {
 		if !games[i].Invalid && strings.HasPrefix(games[i].SubType, RankedPrefix) {
 			playerScores[i] = PlayerScoreFromGame(summoner, games[i].Statistics)

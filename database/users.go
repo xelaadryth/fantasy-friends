@@ -2,11 +2,9 @@ package database
 
 import (
 	"errors"
-	"fmt"
 	"os"
 
 	"github.com/jackc/pgx"
-
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -24,46 +22,43 @@ const (
 )
 
 //Login a user account from the db
-func Login(username string, password string) error {
-	var id int64
+func Login(username string, password string) (string, error) {
+	var userID int64
 	var hash []byte
 	err := DBConnectionPool.QueryRow(
-		QueryGetUserAccountByUsername, username).Scan(&id, &hash)
+		QueryGetUserAccountByUsername, username).Scan(&userID, &hash)
 	if err != nil {
-		return errors.New("User doesn't exist.")
+		return "", errors.New("User doesn't exist.")
 	}
 
 	err = bcrypt.CompareHashAndPassword(hash, []byte(password+pepper))
 	if err != nil {
-		return errors.New("Invalid password.")
+		return "", errors.New("Invalid password.")
 	}
 
-	return nil
+	sessionID, err := AddSession(userID)
+	if err != nil {
+		return "", err
+	}
+
+	return sessionID, nil
 }
 
 //Register a new account to the db
-func Register(username string, password string) error {
-	rows, err := DBConnectionPool.Query(QueryGetUserAccountByUsername, username)
-	if err != nil {
-		return errors.New("Error accessing database.")
-	}
-
-	//Next returns false when rows runs out, but we expect to have 0 rows returned so error
-	if rows.Next() {
-		return errors.New(fmt.Sprint("User ", username, " already exists."))
-	}
-
+func Register(username string, password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password+pepper), BcryptCost)
 	if err != nil {
-		return errors.New("Error generating account.")
+		return "", errors.New("Error generating account.")
 	}
 
-	_, err = DBConnectionPool.Exec(QueryPutUserAccount, username, hash)
+	response, err := DBConnectionPool.Exec(QueryPutUserAccount, username, hash)
 	if err != nil {
-		return errors.New("Error creating account.")
+		return "", errors.New("Error creating account.")
 	}
+	userID := RowInserted(response)
+	sessionID, err := AddSession(userID)
 
-	return nil
+	return sessionID, nil
 }
 
 //PreparePepper gets the pepper value from environment variables

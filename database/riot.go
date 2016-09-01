@@ -40,7 +40,8 @@ func prepareRiotStatements(conn *pgx.Conn) (err error) {
 		return err
 	}
 
-	//TODO: Do something about the case when someone name changes (makes us not able to mark other columns as unique)
+	//TODO: Remove this caching when rate limits are removed on production key
+	//Edge case when someone name changes (makes us not able to mark other columns as unique)
 	//Also has the issue where if someone switches to a an unused name already used by the db, cached version will be used
 	_, err = conn.Prepare(QueryUpsertSummoner, `
 	  INSERT INTO fantasy_friends.summoner_cache (id, summoner_name, summoner_level, profile_icon_id, revision_date, normalized_name, region)
