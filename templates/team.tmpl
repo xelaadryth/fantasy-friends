@@ -1,3 +1,5 @@
+{{$team := index .session "team"}}
+{{$region := index .session "region"}}
 <html>
   {{template "header.tmpl"}}
 <body>
@@ -6,31 +8,30 @@
   <div class="jumbotron text-center">
     <div class="container">
       <h1>Team Management</h1>
-      <p>NOT YET ENABLED!!!</p>
-      <p>Please swap out members to your custom team here!</p>
+      <p>Swap out members to your custom team here!</p>
       <form id="queryForm" action="/team" method="post" class="form-horizontal">
         <div class="form-group">
           <div class="col-md-6 col-md-offset-3">
             <table class="table jumbotron table-bordered bg-blue-team">
               <thead>
                 <tr>
-                  <th>{{index .session "teamName"}}</th>
+                  <th>{{index $team "name"}}</th>
                 </tr>
               </thead>
               <tr>
-                <td><input name="blueTeamTop" id="top" class="form-control" placeholder="Top" value={{index .session "blueTeamTop"}}></input></td>
+                <td><input name="blueTeamTop" id="top" class="form-control" placeholder="Top" value={{index $team "top"}}></input></td>
               </tr>
               <tr>
-                <td><input name="blueTeamJungle" id="jungle" class="form-control" placeholder="Jungle" value={{index .session "blueTeamJungle"}}></input></td>
+                <td><input name="blueTeamJungle" id="jungle" class="form-control" placeholder="Jungle" value={{index $team "jungle"}}></input></td>
               </tr>
               <tr>
-                <td><input name="blueTeamMid" id="mid" class="form-control" placeholder="Mid" value={{index .session "blueTeamMid"}}></input></td>
+                <td><input name="blueTeamMid" id="mid" class="form-control" placeholder="Mid" value={{index $team "mid"}}></input></td>
               </tr>
               <tr>
-                <td><input name="blueTeamBottom" id="bottom" class="form-control" placeholder="Bottom" value={{index .session "blueTeamBottom"}}></input></td>
+                <td><input name="blueTeamBottom" id="bottom" class="form-control" placeholder="Bottom" value={{index $team "bottom"}}></input></td>
               </tr>
               <tr>
-                <td><input name="blueTeamSupport" id="support" class="form-control" placeholder="Support" value={{index .session "blueTeamSupport"}}></input></td>
+                <td><input name="blueTeamSupport" id="support" class="form-control" placeholder="Support" value={{index $team "support"}}></input></td>
               </tr>
             </table>
           </div>
@@ -40,7 +41,7 @@
             <label for="region" class="control-label">Region</label>
           </div>
           <div class="col-sm-2">
-            <input name="region" id="region" class="form-control text-center" value="na">
+            <input name="region" id="region" class="form-control text-center" value={{if $region}}{{$region}}{{else}}{{"na"}}{{end}}>
           </div>
           <div class="col-sm-5">
             <button type="submit" class="form-control btn btn-primary">Save</button>

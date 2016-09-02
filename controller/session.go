@@ -8,18 +8,18 @@ import (
 	"github.com/xelaadryth/fantasy-friends/database"
 )
 
-func validateSession(session *sessions.Session) error {
+func validateSession(session *sessions.Session) (int64, error) {
 	sessionID := (*session).Get(sessionSessionID)
 	sessionIDString, ok := sessionID.(string)
 	if !ok || sessionIDString == "" {
-		return errors.New("Malformed or missing session ID.")
+		return 0, errors.New("Malformed or missing session ID.")
 	}
-	_, err := database.GetUserIDFromSession(sessionIDString)
+	userID, err := database.GetUserIDFromSession(sessionIDString)
 	if err != nil {
-		return errors.New("Invalid or expired session.")
+		return 0, errors.New("Invalid or expired session.")
 	}
 
-	return nil
+	return userID, nil
 }
 
 //clearSession and save it

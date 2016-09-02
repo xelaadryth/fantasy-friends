@@ -1,4 +1,5 @@
 {{$displayName := index .session "displayName"}}
+{{$region := index .session "region"}}
 <html>
   {{template "header.tmpl"}}
 <body>
@@ -68,7 +69,7 @@
             <label for="region" class="control-label">Region</label>
           </div>
           <div class="col-sm-2">
-            <input name="region" id="region" class="form-control text-center" value="na">
+            <input name="region" id="region" class="form-control text-center" value={{if $region}}{{$region}}{{else}}{{"na"}}{{end}}>
           </div>
           <div class="col-sm-5">
             <button type="submit" class="form-control btn btn-primary">Play</button>
@@ -95,8 +96,10 @@
       <div class="col-md-6">
         <h3><span class="glyphicon glyphicon-wrench"></span> Next Steps</h3>
         <ul>
-          <li>Add persistent team storage for a user's custom team</li>
-          <li>Randomize default opponent team</li>
+          <li>Fix bugs with regions other than NA.</li>
+          <li>Validator for valid regions.</li>
+          <li>Revamp summoners cache to allow cross-region teams.</li>
+          <li>Show current user's team on main page</li>
           <li>Update user teams asynchronously for instant load times instead of 10 seconds (due to rate-limiting)</li>
           <li>Rebalance Fantasy points to favor role selection</li>
           <li>Fancier game simulator using an algorithm for smoothing scores to realistic values</li>

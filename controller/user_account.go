@@ -67,6 +67,7 @@ func processUser(c *gin.Context) {
 
 	if err != nil {
 		invalidHandler(c, http.StatusBadRequest, err)
+		return
 	}
 
 	//Give the user a session

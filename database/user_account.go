@@ -19,6 +19,7 @@ var pepper string
 const (
 	QueryGetUserAccountByUsername = "getUserAccount"
 	QueryPutUserAccount           = "putUserAccount"
+	QueryGetUsername              = "getUsername"
 )
 
 //Login a user account from the db
@@ -64,6 +65,18 @@ func Register(username string, password string) (string, error) {
 	return sessionID, nil
 }
 
+//GetUsername for given user ID
+func GetUsername(userID int64) (string, error) {
+	var username string
+	err := DBConnectionPool.QueryRow(
+		QueryGetUsername, userID).Scan(&username)
+	if err != nil {
+		return "", errors.New("User doesn't exist.")
+	}
+
+	return username, nil
+}
+
 //PreparePepper gets the pepper value from environment variables
 func PreparePepper() error {
 	pepper = os.Getenv("PEPPER")
@@ -88,6 +101,13 @@ func prepareUserStatements(conn *pgx.Conn) error {
 		VALUES ($1, $2)
 		RETURNING id
   `)
+	if err != nil {
+		return err
+	}
+
+	_, err = conn.Prepare(QueryGetUsername, `
+			SELECT username FROM fantasy_friends.user_account WHERE id=$1
+	  `)
 	if err != nil {
 		return err
 	}

@@ -3,11 +3,12 @@
 A League of Legends fantasy game where any summoner name can be used instead of just pro players.
 
 ## Setup
+Note: This setup guide does not cover everything needed to set up this application, but gives a rough idea of the steps required.
 
 1. Install [Go](https://golang.org/dl/).
 2. Download all third party dependencies with ```go get```.
 3. Get a [Riot Developer API key](https://developer.riotgames.com/) from the official site.
-4. Set up a [PostgreSQL](https://www.postgresql.org/download/) database
+4. Set up a [PostgreSQL](https://www.postgresql.org/download/) database and set up tables as specified in the /database/database.go file.
 5. Set your environment settings in the environment file "```example.env```" and rename the file to "```.env```".
 6. Rename "example.env" to ".env" using: ```ren example.env .env```.
 7. Run ```build_run_local.bat``` to build to a Windows executable and run it directly to test.

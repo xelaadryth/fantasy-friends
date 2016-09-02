@@ -67,6 +67,11 @@ func afterConnect(conn *pgx.Conn) error {
 		return err
 	}
 
+	err = prepareTeamStatements(conn)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
