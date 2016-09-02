@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/contrib/sessions"
@@ -71,9 +72,33 @@ func processUser(c *gin.Context) {
 
 	//Give the user a session
 	session := sessions.Default(c)
+	clearSession(&session)
 	session.Set("sessionID", sessionID)
-	session.Set("displayName", userForm.Username)
+	session.Set(sessionDisplayName, userForm.Username)
 	session.Save()
+
+	c.Redirect(http.StatusFound, "/")
+}
+
+//clearSession and save it
+func clearSession(session *sessions.Session) error {
+	sessionID := (*session).Get("sessionID")
+	if sessionIDString, ok := sessionID.(string); ok && sessionIDString != "" {
+		err := database.DeleteSession(sessionIDString)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+	(*session).Clear()
+	(*session).Save()
+	return nil
+}
+
+//logout the current user
+func logout(c *gin.Context) {
+	//Give the user a session
+	session := sessions.Default(c)
+	clearSession(&session)
 
 	c.Redirect(http.StatusFound, "/")
 }

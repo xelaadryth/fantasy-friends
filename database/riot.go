@@ -30,9 +30,9 @@ func CacheSummoner(region string, normalizedName string, summoner goriot.Summone
 	return err
 }
 
-func prepareRiotStatements(conn *pgx.Conn) (err error) {
-	_, err = conn.Prepare(QueryGetSummoner, `
-    SELECT id, summoner_name, summoner_level, profile_icon_id, revision_date
+func prepareRiotStatements(conn *pgx.Conn) error {
+	_, err := conn.Prepare(QueryGetSummoner, `
+		SELECT id, summoner_name, summoner_level, profile_icon_id, revision_date
 		FROM fantasy_friends.summoner_cache
 		WHERE normalized_name=$1 AND region=$2
   `)
@@ -44,8 +44,8 @@ func prepareRiotStatements(conn *pgx.Conn) (err error) {
 	//Edge case when someone name changes (makes us not able to mark other columns as unique)
 	//Also has the issue where if someone switches to a an unused name already used by the db, cached version will be used
 	_, err = conn.Prepare(QueryUpsertSummoner, `
-	  INSERT INTO fantasy_friends.summoner_cache (id, summoner_name, summoner_level, profile_icon_id, revision_date, normalized_name, region)
-	  VALUES ($1, $2, $3, $4, $5, $6, $7)
+		INSERT INTO fantasy_friends.summoner_cache (id, summoner_name, summoner_level, profile_icon_id, revision_date, normalized_name, region)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		ON CONFLICT (normalized_name)
 		DO UPDATE SET (id, summoner_name, summoner_level, profile_icon_id, revision_date, region) = ($1, $2, $3, $4, $5, $7)
 	`)

@@ -2,7 +2,6 @@ package controller
 
 import (
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/gin-gonic/contrib/secure"
@@ -34,6 +33,15 @@ func addMiddleware(router *gin.Engine) {
 	router.Use(sessions.Sessions("fantasy-friends", cookieStore))
 }
 
+func sessionAsMap(session *sessions.Session) *map[string]interface{} {
+	sessionMap := make(map[string]interface{})
+	for _, fieldName := range sessionFields {
+		sessionMap[fieldName] = (*session).Get(fieldName)
+	}
+
+	return &sessionMap
+}
+
 //Route does all the routing for the app
 func Route() {
 	//Get port number to listen for
@@ -50,24 +58,13 @@ func Route() {
 	router.Static("/static", "./static")
 
 	//TODO: Split into routing groups
-	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.tmpl", gin.H{
-			"displayName": sessions.Default(c).Get("displayName"),
-		})
-	})
-	router.GET("/about", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "about.tmpl", gin.H{
-			"displayName": sessions.Default(c).Get("displayName"),
-		})
-	})
+	router.GET("/", routeHome)
+	router.GET("/about", routeAbout)
 
 	//User Accounts ==============================================================================================================
-	router.GET("/login", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "login.tmpl", gin.H{
-			"displayName": sessions.Default(c).Get("displayName"),
-		})
-	})
+	router.GET("/login", routeLogin)
 	router.POST("/login", processUser)
+	router.GET("/logout", logout)
 
 	//Fantasy ====================================================================================================================
 	router.POST("/matchResults", playMatch)

@@ -51,12 +51,15 @@ func Register(username string, password string) (string, error) {
 		return "", errors.New("Error generating account.")
 	}
 
-	response, err := DBConnectionPool.Exec(QueryPutUserAccount, username, hash)
+	var userID int64
+	err = DBConnectionPool.QueryRow(QueryPutUserAccount, username, hash).Scan(&userID)
 	if err != nil {
 		return "", errors.New("Error creating account.")
 	}
-	userID := RowInserted(response)
 	sessionID, err := AddSession(userID)
+	if err != nil {
+		return "", err
+	}
 
 	return sessionID, nil
 }
@@ -74,15 +77,16 @@ func PreparePepper() error {
 // prepareUserStatements readies SQL queries for later use
 func prepareUserStatements(conn *pgx.Conn) error {
 	_, err := conn.Prepare(QueryGetUserAccountByUsername, `
-    SELECT id, hash FROM fantasy_friends.user_account WHERE username=$1
+		SELECT id, hash FROM fantasy_friends.user_account WHERE username=$1
   `)
 	if err != nil {
 		return err
 	}
 
 	_, err = conn.Prepare(QueryPutUserAccount, `
-    INSERT INTO fantasy_friends.user_account (username, hash)
-    VALUES ($1, $2)
+		INSERT INTO fantasy_friends.user_account (username, hash)
+		VALUES ($1, $2)
+		RETURNING id
   `)
 	if err != nil {
 		return err

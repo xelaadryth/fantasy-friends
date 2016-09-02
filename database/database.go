@@ -2,8 +2,6 @@ package database
 
 import (
 	"os"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/jackc/pgx"
@@ -40,22 +38,6 @@ const MaxDBConnections = 5
 
 //DBTimeout in seconds
 const DBTimeout = 30 * time.Second
-
-// RowsAffected returns the oid of the row inserted. If the CommandTag was not
-// for a row insertion command then it returns 0
-func RowInserted(ct pgx.CommandTag) int64 {
-	s := string(ct)
-	if strings.HasPrefix(s, "INSERT ") {
-		index := strings.Index(s, " ")
-		if index != -1 {
-			n, _ := strconv.ParseInt(s[index+1:], 10, 64)
-			return n
-		}
-	}
-
-	//Failed to find oid
-	return 0
-}
 
 // afterConnect creates the prepared statements that this application uses
 func afterConnect(conn *pgx.Conn) error {

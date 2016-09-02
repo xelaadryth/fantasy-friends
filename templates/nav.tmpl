@@ -1,13 +1,14 @@
+{{$navActive := index . "navActive"}}
 <nav class="navbar navbar-default navbar-static-top navbar-inverse">
   <div class="container">
     <ul class="nav navbar-nav">
-      <li{{if eq . "home"}} class="active"{{end}}>
+      <li{{if eq $navActive "home"}} class="active"{{end}}>
         <a href="/"><span class="glyphicon glyphicon-home"></span> Home</a>
       </li>
-      <li{{if eq . "play"}} class="active"{{end}}>
+      <li{{if eq $navActive "play"}} class="active"{{end}}>
         <a href="/"><span class="glyphicon glyphicon-play"></span> Play</a>
       </li>
-      <li class="dropdown{{if eq . "help"}} active{{end}}">
+      <li class="dropdown{{if eq $navActive "help"}} active{{end}}">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="glyphicon glyphicon-info-sign"></span> Help <span class="caret"></span></a>
         <ul class="dropdown-menu" role="menu">
           <li><a href="/#how-to-play">How to Play</a></li>
@@ -16,8 +17,15 @@
       </li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
-      <li class="navbar-right{{if eq . "user"}} active{{end}}">
-        <a href="/login"><span class="glyphicon glyphicon-user"></span> Login/Register</a>
+      <li class="navbar-right{{if eq $navActive "user"}} active{{end}}">
+        {{if $.displayName}}
+        <a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
+      </li>
+      <li>
+        <a href="/"><span class="glyphicon glyphicon-user"></span> {{$.displayName}}</a>
+        {{else}}
+        <a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login/Register</a>
+        {{end}}
       </li>
     </ul>
   </div>

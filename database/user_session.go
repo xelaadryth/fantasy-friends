@@ -13,12 +13,14 @@ import (
 const (
 	QueryGetSessionUserID = "getSession"
 	QueryPutSession       = "putSession"
+	QueryDeleteSession    = "deleteSession"
 )
 
 //InsertionAttempts to generate a session ID. Honestly we should never even have a conflict
 const InsertionAttempts = 5
 const SessionIDLength = 64
 
+//GetUserIDFromSession database table
 func GetUserIDFromSession(sessionID string) (int64, error) {
 	var userID int64
 	err := DBConnectionPool.QueryRow(
@@ -30,6 +32,7 @@ func GetUserIDFromSession(sessionID string) (int64, error) {
 	return userID, nil
 }
 
+//AddSession to the database
 func AddSession(userID int64) (string, error) {
 	//Keep trying to insert until we have a unique sessionID
 	for i := 0; i < InsertionAttempts; i++ {
@@ -52,18 +55,32 @@ func AddSession(userID int64) (string, error) {
 	return "", errors.New("Unable to generate a unique session ID.")
 }
 
+//DeleteSession from the database
+func DeleteSession(sessionID string) error {
+	_, err := DBConnectionPool.Exec(QueryDeleteSession, sessionID)
+	return err
+}
+
 //prepareSessionStatements readies SQL queries for later use
 func prepareSessionStatements(conn *pgx.Conn) error {
 	_, err := conn.Prepare(QueryGetSessionUserID, `
-    SELECT user_id FROM fantasy_friends.user_session WHERE id=$1
+		SELECT user_id FROM fantasy_friends.user_session WHERE id=$1
   `)
 	if err != nil {
 		return err
 	}
 
 	_, err = conn.Prepare(QueryPutSession, `
-    INSERT INTO fantasy_friends.user_session (id, user_id, creation_time)
-    VALUES ($1, $2, $3)
+		INSERT INTO fantasy_friends.user_session (id, user_id, creation_time)
+		VALUES ($1, $2, $3)
+  `)
+	if err != nil {
+		return err
+	}
+
+	_, err = conn.Prepare(QueryDeleteSession, `
+		DELETE FROM fantasy_friends.user_session
+		WHERE id = $1
   `)
 	if err != nil {
 		return err
