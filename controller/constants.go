@@ -12,8 +12,7 @@ const (
 	sessionMid         = "mid"
 	sessionBottom      = "bottom"
 	sessionSupport     = "support"
-	sessionRegion      = "region"
 )
 
 //sessionFields that we want to hold at the top level of the session object
-var sessionFields = [...]string{sessionDisplayName, sessionNavActive, sessionTeam, sessionRegion}
+var sessionFields = [...]string{sessionDisplayName, sessionNavActive, sessionTeam}

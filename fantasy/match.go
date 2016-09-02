@@ -15,7 +15,7 @@ func PlayMatch(region string, inputSummonerNames ...string) (MatchScore, error) 
 	}
 	summonerNames := goriot.NormalizeSummonerName(inputSummonerNames...)
 
-	summonersMap, err := GetSummonersByName(region, summonerNames...)
+	summonersMap, _, err := GetSummonersByName(region, summonerNames...)
 	if err != nil {
 		return MatchScore{}, err
 	}

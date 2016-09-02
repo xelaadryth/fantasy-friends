@@ -26,6 +26,7 @@ const (
 
 //GetTeams for the given user id from the database if they exist
 func GetTeams(userID int64) (*[]FantasyTeam, error) {
+	//TODO: Update this if we expect more than 1 team per player in the future
 	teams := make([]FantasyTeam, 0, 1)
 	rows, _ := DBConnectionPool.Query(QueryGetTeams, userID)
 
@@ -49,36 +50,40 @@ func GetTeams(userID int64) (*[]FantasyTeam, error) {
 	return &teams, rows.Err()
 }
 
-//AddTeam to database, errors if team already exists in that slot. Team ID is ignored.
-func AddTeam(team FantasyTeam) error {
+//AddTeam to database, errors if team already exists in that slot
+func AddTeam(owner int64, teamName string, position int,
+	top int64, jungle int64, mid int64, bottom int64, support int64) error {
+	//Get the cache IDs
 	_, err := DBConnectionPool.Exec(
 		QueryInsertTeam,
-		team.Owner,
-		team.Name,
-		team.Position,
-		team.Top,
-		team.Jungle,
-		team.Mid,
-		team.Bottom,
-		team.Support,
+		owner,
+		teamName,
+		position,
+		top,
+		jungle,
+		mid,
+		bottom,
+		support,
 	)
 
 	return err
 }
 
 //UpdateTeam that already exists in the database
-func UpdateTeam(team FantasyTeam) error {
+func UpdateTeam(teamID int64, owner int64, teamName string, position int,
+	top int64, jungle int64, mid int64, bottom int64, support int64) error {
+	//Get the cache IDs
 	_, err := DBConnectionPool.Exec(
 		QueryUpdateTeam,
-		team.ID,
-		team.Owner,
-		team.Name,
-		team.Position,
-		team.Top,
-		team.Jungle,
-		team.Mid,
-		team.Bottom,
-		team.Support,
+		teamID,
+		owner,
+		teamName,
+		position,
+		top,
+		jungle,
+		mid,
+		bottom,
+		support,
 	)
 
 	return err

@@ -18,102 +18,100 @@ func NormalizeName(summonerName string) string {
 	return normalizedSummonerNames[0]
 }
 
-//attemptUncacheSummonersByName tries to retrieve all specified summoners from cache if possible
-func attemptUncacheSummonersByName(region string, summonerNames ...string) (map[string]goriot.Summoner, error) {
-	summonersMap := make(map[string]goriot.Summoner)
+//GetSummonersByName from cache if available, otherwise grab from Riot API and cache them.
+//Outputs a mapping of normalized summoner name to summoner objects
+func GetSummonersByName(region string, inputSummonerNames ...string) (map[string]goriot.Summoner, map[string]int64, error) {
+	summonerNames := goriot.NormalizeSummonerName(inputSummonerNames...)
+	nameToSummoner := make(map[string]goriot.Summoner)
+	nameToCacheID := make(map[string]int64)
 	var err error
-
+	//Try to uncache them first
 	for _, summonerName := range summonerNames {
-		summonersMap[summonerName], err = database.UncacheSummonerByName(region, summonerName)
+		nameToSummoner[summonerName], nameToCacheID[summonerName], err = database.UncacheSummonerByName(region, summonerName)
 		if err != nil {
-			return summonersMap, err
+			break
 		}
 	}
 
-	//This happens if we have duplicate summoner names
-	if len(summonersMap) != len(summonerNames) {
-		return summonersMap, errors.New("Duplicate or invalid summoner names.")
+	//Cache contained all of the summoner names, we're done
+	if len(nameToSummoner) == len(inputSummonerNames) {
+		return nameToSummoner, nameToCacheID, nil
 	}
 
-	return summonersMap, nil
+	//TODO: Move this into database in summoner_cache
+	//Either the cache didn't contain all of the ids or there are repeat IDs. Query Riot API next
+	nameToSummoner, err = goriot.SummonerByName(region, summonerNames...)
+	if err != nil || len(nameToSummoner) != len(inputSummonerNames) {
+		return nameToSummoner, nameToCacheID, errors.New("Duplicate or invalid summoner names.")
+	}
+
+	var cacheErr error
+	//Insert the results of the fresh query into the summoner cache
+	for normalizedName, summoner := range nameToSummoner {
+		nameToCacheID[normalizedName], cacheErr = database.CacheSummoner(region, normalizedName, summoner)
+		if cacheErr != nil {
+			log.Println("Failed to cache summoner", normalizedName, summoner, "with error", cacheErr)
+		}
+	}
+
+	return nameToSummoner, nameToCacheID, nil
 }
 
-//attemptUncacheSummonersByID tries to retrieve all specified summoner from cache if possible
-func attemptUncacheSummonersByID(region string, summonerIDs ...int64) (map[int64]goriot.Summoner, error) {
-	summonersMap := make(map[int64]goriot.Summoner)
+//GetSummonersBySummonerID from cache if available, otherwise grab from Riot API and cache them
+func GetSummonersBySummonerID(region string, summonerIDs ...int64) (map[int64]goriot.Summoner, map[int64]int64, error) {
+	idToSummoner := make(map[int64]goriot.Summoner)
+	idToCacheID := make(map[int64]int64)
 	var err error
-
+	//Try to uncache them first
 	for _, summonerID := range summonerIDs {
-		summonersMap[summonerID], err = database.UncacheSummonerByID(region, summonerID)
+		idToSummoner[summonerID], idToCacheID[summonerID], err = database.UncacheSummonerBySummonerID(region, summonerID)
 		if err != nil {
-			return summonersMap, err
+			break
 		}
 	}
 
-	//This happens if we have duplicate summoner names
-	if len(summonersMap) != len(summonerIDs) {
-		return summonersMap, errors.New("Duplicate or invalid summoner names.")
+	//Cache contained all of the summoner IDs, we're done
+	if len(idToSummoner) == len(summonerIDs) {
+		return idToSummoner, idToCacheID, nil
 	}
 
-	return summonersMap, nil
+	//TODO: Move this into database in summoner_cache
+	//Either the cache didn't contain all of the ids or there are repeat IDs. Query Riot API next
+	idToSummoner, err = goriot.SummonerByID(region, summonerIDs...)
+	if err != nil || len(idToSummoner) != len(summonerIDs) {
+		return idToSummoner, idToCacheID, errors.New("Duplicate or invalid summoner IDs.")
+	}
+
+	var cacheErr error
+	//Insert the results of the fresh query into the summoner cache
+	for _, summoner := range idToSummoner {
+		normalizedName := NormalizeName(summoner.Name)
+		idToCacheID[summoner.ID], cacheErr = database.CacheSummoner(region, normalizedName, summoner)
+		if cacheErr != nil {
+			log.Println("Failed to cache summoner", normalizedName, summoner, "with error", cacheErr)
+		}
+	}
+
+	return idToSummoner, idToCacheID, nil
 }
 
-//GetSummonersByName by checking the cache and then by asking Riot
-//TODO: Pass stuff by reference instead of copying values
-func GetSummonersByName(region string, summonerNames ...string) (map[string]goriot.Summoner, error) {
-	//Attempt to get Summoner objects for each normalized summoner name
-	//TODO: Remove this caching when rate limits are removed
-	summonersMap, err := attemptUncacheSummonersByName(region, summonerNames...)
-	if err != nil {
-		//If we can't, then query the Riot API for the summoner IDs
-		summonersMap, err = goriot.SummonerByName(region, summonerNames...)
+//GetSummonersByCacheID if they exist, error otherwise. Should never error due to foreign key constraints unless
+//malicious users are messing around
+func GetSummonersByCacheID(summonerCacheIDs ...int64) (map[int64]goriot.Summoner, error) {
+	cacheIDToSummoner := make(map[int64]goriot.Summoner)
+	var err error
+	//Try to uncache them first
+	for _, summonerCacheID := range summonerCacheIDs {
+		cacheIDToSummoner[summonerCacheID], err = database.UncacheSummonerByCacheID(summonerCacheID)
 		if err != nil {
-			return summonersMap, err
-		}
-
-		//Insert the results of the fresh queries into the summoner cache
-		for normalizedName, summoner := range summonersMap {
-			cacheErr := database.CacheSummoner(region, normalizedName, summoner)
-			if cacheErr != nil {
-				log.Println("Failed to cache summoner", normalizedName, summoner, "with error", cacheErr)
-			}
+			break
 		}
 	}
 
-	//This happens if we have duplicate summoner names
-	if len(summonersMap) != len(summonerNames) {
-		return summonersMap, errors.New("Duplicate or invalid summoner names.")
+	//Cache contained all of the summoner IDs, we're done
+	if len(cacheIDToSummoner) != len(summonerCacheIDs) {
+		return cacheIDToSummoner, errors.New("Duplicate or invalid summoner cache IDs.")
 	}
 
-	return summonersMap, nil
-}
-
-//GetSummonersByID by checking the cache and then by asking Riot
-func GetSummonersByID(region string, summonerIDs ...int64) (map[int64]goriot.Summoner, error) {
-	//Attempt to get Summoner objects for each summonerID
-	//TODO: Remove this caching when rate limits are removed
-	summonersMap, err := attemptUncacheSummonersByID(region, summonerIDs...)
-	if err != nil {
-		//If we can't, then query the Riot API for the summoner IDs
-		summonersMap, err = goriot.SummonerByID(region, summonerIDs...)
-		if err != nil {
-			return summonersMap, err
-		}
-
-		//Insert the results of the fresh queries into the summoner cache
-		for _, summoner := range summonersMap {
-			normalizedName := NormalizeName(summoner.Name)
-			cacheErr := database.CacheSummoner(region, normalizedName, summoner)
-			if cacheErr != nil {
-				log.Println("Failed to cache summoner", normalizedName, summoner, "with error", cacheErr)
-			}
-		}
-	}
-
-	//This happens if we have duplicate summoner names
-	if len(summonersMap) != len(summonerIDs) {
-		return summonersMap, errors.New("Duplicate or invalid summoner names.")
-	}
-
-	return summonersMap, nil
+	return cacheIDToSummoner, nil
 }
