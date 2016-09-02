@@ -13,7 +13,7 @@ func routeHome(c *gin.Context) {
 	session.Set(sessionNavActive, "home")
 	sessionMap := sessionAsMap(&session)
 	c.HTML(http.StatusOK, "index.tmpl", gin.H{
-		sessionName: *sessionMap,
+		sessionSession: *sessionMap,
 	})
 }
 
@@ -22,7 +22,7 @@ func routeAbout(c *gin.Context) {
 	session.Set(sessionNavActive, "help")
 	sessionMap := sessionAsMap(&session)
 	c.HTML(http.StatusOK, "about.tmpl", gin.H{
-		sessionName: *sessionMap,
+		sessionSession: *sessionMap,
 	})
 }
 
@@ -31,6 +31,6 @@ func routeLogin(c *gin.Context) {
 	session.Set(sessionNavActive, "user")
 	sessionMap := sessionAsMap(&session)
 	c.HTML(http.StatusOK, "login.tmpl", gin.H{
-		sessionName: *sessionMap,
+		sessionSession: *sessionMap,
 	})
 }

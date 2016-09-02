@@ -8,15 +8,26 @@ import (
 
 //Queries that are prepared for easy calling
 const (
-	QueryGetSummoner    = "getSummoner"
-	QueryUpsertSummoner = "upsertSummoner"
+	QueryGetSummonerByName = "getSummonerByName"
+	QueryGetSummonerByID   = "getSummonerByID"
+	QueryUpsertSummoner    = "upsertSummoner"
 )
 
-//UncacheSummoner from database if it exists, return an error otherwise
-func UncacheSummoner(region string, normalizedName string) (goriot.Summoner, error) {
+//UncacheSummonerByName from database if it exists, return an error otherwise
+func UncacheSummonerByName(region string, normalizedName string) (goriot.Summoner, error) {
 	summoner := goriot.Summoner{}
 	err := DBConnectionPool.QueryRow(
-		QueryGetSummoner, normalizedName, region).Scan(
+		QueryGetSummonerByName, normalizedName, region).Scan(
+		&summoner.ID, &summoner.Name, &summoner.SummonerLevel, &summoner.ProfileIconID, &summoner.RevisionDate)
+
+	return summoner, err
+}
+
+//UncacheSummonerByID from database if it exists, return an error otherwise
+func UncacheSummonerByID(region string, summonerID int64) (goriot.Summoner, error) {
+	summoner := goriot.Summoner{}
+	err := DBConnectionPool.QueryRow(
+		QueryGetSummonerByID, summonerID, region).Scan(
 		&summoner.ID, &summoner.Name, &summoner.SummonerLevel, &summoner.ProfileIconID, &summoner.RevisionDate)
 
 	return summoner, err
@@ -31,11 +42,20 @@ func CacheSummoner(region string, normalizedName string, summoner goriot.Summone
 }
 
 func prepareRiotStatements(conn *pgx.Conn) error {
-	_, err := conn.Prepare(QueryGetSummoner, `
+	_, err := conn.Prepare(QueryGetSummonerByName, `
 		SELECT id, summoner_name, summoner_level, profile_icon_id, revision_date
 		FROM fantasy_friends.summoner_cache
 		WHERE normalized_name=$1 AND region=$2
   `)
+	if err != nil {
+		return err
+	}
+
+	_, err = conn.Prepare(QueryGetSummonerByID, `
+			SELECT id, summoner_name, summoner_level, profile_icon_id, revision_date
+			FROM fantasy_friends.summoner_cache
+			WHERE id=$1 AND region=$2
+	  `)
 	if err != nil {
 		return err
 	}

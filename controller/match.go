@@ -44,7 +44,7 @@ func playMatch(c *gin.Context) {
 	sessionMap := sessionAsMap(&session)
 
 	c.HTML(http.StatusOK, "match.tmpl", gin.H{
-		sessionName:  *sessionMap,
-		"matchScore": matchScore,
+		sessionSession: *sessionMap,
+		"matchScore":   matchScore,
 	})
 }
