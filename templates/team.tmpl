@@ -1,0 +1,54 @@
+<html>
+  {{template "header.tmpl"}}
+<body>
+  {{template "nav.tmpl" .session}}
+
+  <div class="jumbotron text-center">
+    <div class="container">
+      <h1>Team Management</h1>
+      <p>NOT YET ENABLED!!!</p>
+      <p>Please swap out members to your custom team here!</p>
+      <form id="queryForm" action="/team" method="post" class="form-horizontal">
+        <div class="form-group">
+          <div class="col-md-6 col-md-offset-3">
+            <table class="table jumbotron table-bordered bg-blue-team">
+              <thead>
+                <tr>
+                  <th>{{index .session "teamName"}}</th>
+                </tr>
+              </thead>
+              <tr>
+                <td><input name="blueTeamTop" id="top" class="form-control" placeholder="Top" value={{index .session "blueTeamTop"}}></input></td>
+              </tr>
+              <tr>
+                <td><input name="blueTeamJungle" id="jungle" class="form-control" placeholder="Jungle" value={{index .session "blueTeamJungle"}}></input></td>
+              </tr>
+              <tr>
+                <td><input name="blueTeamMid" id="mid" class="form-control" placeholder="Mid" value={{index .session "blueTeamMid"}}></input></td>
+              </tr>
+              <tr>
+                <td><input name="blueTeamBottom" id="bottom" class="form-control" placeholder="Bottom" value={{index .session "blueTeamBottom"}}></input></td>
+              </tr>
+              <tr>
+                <td><input name="blueTeamSupport" id="support" class="form-control" placeholder="Support" value={{index .session "blueTeamSupport"}}></input></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-1 col-sm-offset-2">
+            <label for="region" class="control-label">Region</label>
+          </div>
+          <div class="col-sm-2">
+            <input name="region" id="region" class="form-control text-center" value="na">
+          </div>
+          <div class="col-sm-5">
+            <button type="submit" class="form-control btn btn-primary">Save</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

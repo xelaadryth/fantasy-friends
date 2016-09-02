@@ -2,6 +2,7 @@ package controller
 
 const (
 	sessionName        = "session"
+	sessionSessionID   = "sessionID"
 	sessionDisplayName = "displayName"
 	sessionNavActive   = "navActive"
 )
