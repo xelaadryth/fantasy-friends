@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 
+	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/xelaadryth/fantasy-friends/fantasy"
 )
@@ -47,8 +48,12 @@ func playMatch(c *gin.Context) {
 		invalidHandler(c, http.StatusBadRequest, err)
 		return
 	}
+	session := sessions.Default(c)
+	session.Set(sessionNavActive, "play")
+	sessionMap := sessionAsMap(&session)
 
 	c.HTML(http.StatusOK, "match.tmpl", gin.H{
+		sessionName:  *sessionMap,
 		"matchScore": matchScore,
 	})
 }
