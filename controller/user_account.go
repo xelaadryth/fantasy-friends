@@ -65,6 +65,7 @@ func processUser(c *gin.Context) {
 		err = errors.New("Invalid user action.")
 	}
 
+	//Error has already been obscured
 	if err != nil {
 		invalidHandler(c, http.StatusBadRequest, err)
 		return
