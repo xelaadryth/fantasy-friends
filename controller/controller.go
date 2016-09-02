@@ -30,6 +30,11 @@ func addMiddleware(router *gin.Engine) {
 		[]byte(os.Getenv("COOKIE_OLD_AUTH_KEY")),
 		[]byte(os.Getenv("COOKIE_OLD_ENCRYPTION_KEY")),
 	)
+	cookieStore.Options(sessions.Options{
+		MaxAge:   60 * 60 * 24 * 30,
+		Secure:   !gin.IsDebugging(),
+		HttpOnly: true,
+	})
 	router.Use(sessions.Sessions("fantasy-friends", cookieStore))
 }
 
@@ -60,13 +65,15 @@ func Route() {
 	//TODO: Split into routing groups
 	router.GET("/", routeHome)
 	router.GET("/about", routeAbout)
-
-	//User Accounts ==============================================================================================================
+	//User Accounts ======================================================================================================
 	router.GET("/login", routeLogin)
 	router.POST("/login", processUser)
 	router.GET("/logout", logout)
-
-	//Fantasy ====================================================================================================================
+	//Fantasy ============================================================================================================
+	router.GET("/team", routeTeam)
+	router.POST("/team", saveTeam)
 	router.POST("/matchResults", playMatch)
+	//====================================================================================================================
+
 	router.Run(":" + port)
 }

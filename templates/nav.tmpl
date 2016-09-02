@@ -21,8 +21,8 @@
         {{if $.displayName}}
         <a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
       </li>
-      <li>
-        <a href="/"><span class="glyphicon glyphicon-user"></span> {{$.displayName}}</a>
+      <li{{if eq $navActive "team"}} class="active"{{end}}>
+        <a href="/team"><span class="glyphicon glyphicon-user"></span> {{$.displayName}}</a>
         {{else}}
         <a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login/Register</a>
         {{end}}
