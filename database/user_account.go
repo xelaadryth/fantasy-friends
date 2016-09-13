@@ -3,6 +3,7 @@ package database
 import (
 	"errors"
 	"os"
+	"strings"
 
 	"github.com/jackc/pgx"
 	"golang.org/x/crypto/bcrypt"
@@ -27,7 +28,7 @@ func Login(username string, password string) (string, error) {
 	var userID int64
 	var hash []byte
 	err := DBConnectionPool.QueryRow(
-		QueryGetUserAccountByUsername, username).Scan(&userID, &hash)
+		QueryGetUserAccountByUsername, strings.ToLower(username)).Scan(&userID, &hash)
 	if err != nil {
 		return "", errors.New("User doesn't exist.")
 	}
@@ -53,7 +54,7 @@ func Register(username string, password string) (string, error) {
 	}
 
 	var userID int64
-	err = DBConnectionPool.QueryRow(QueryPutUserAccount, username, hash).Scan(&userID)
+	err = DBConnectionPool.QueryRow(QueryPutUserAccount, username, strings.ToLower(username), hash).Scan(&userID)
 	if err != nil {
 		return "", errors.New("Error creating account.")
 	}
@@ -90,15 +91,15 @@ func PreparePepper() error {
 // prepareUserStatements readies SQL queries for later use
 func prepareUserStatements(conn *pgx.Conn) error {
 	_, err := conn.Prepare(QueryGetUserAccountByUsername, `
-		SELECT id, hash FROM fantasy_friends.user_account WHERE LOWER(username)=LOWER($1)
+		SELECT id, hash FROM fantasy_friends.user_account WHERE username_lower=$1
   `)
 	if err != nil {
 		return err
 	}
 
 	_, err = conn.Prepare(QueryPutUserAccount, `
-		INSERT INTO fantasy_friends.user_account (username, hash)
-		VALUES ($1, $2)
+		INSERT INTO fantasy_friends.user_account (username, username_lower, hash)
+		VALUES ($1, $2, $3)
 		RETURNING id
   `)
 	if err != nil {
