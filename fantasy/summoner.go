@@ -34,7 +34,7 @@ func GetSummonersByName(region string, inputSummonerNames ...string) (map[string
 	}
 
 	//Cache contained all of the summoner names, we're done
-	if len(nameToSummoner) == len(inputSummonerNames) {
+	if len(nameToSummoner) == len(inputSummonerNames) && err == nil {
 		return nameToSummoner, nameToCacheID, nil
 	}
 
@@ -71,7 +71,7 @@ func GetSummonersBySummonerID(region string, summonerIDs ...int64) (map[int64]go
 	}
 
 	//Cache contained all of the summoner IDs, we're done
-	if len(idToSummoner) == len(summonerIDs) {
+	if len(idToSummoner) == len(summonerIDs) && err == nil {
 		return idToSummoner, idToCacheID, nil
 	}
 
@@ -104,7 +104,7 @@ func GetSummonersByCacheID(summonerCacheIDs ...int64) (map[int64]goriot.Summoner
 	for _, summonerCacheID := range summonerCacheIDs {
 		cacheIDToSummoner[summonerCacheID], err = database.UncacheSummonerByCacheID(summonerCacheID)
 		if err != nil {
-			break
+			return cacheIDToSummoner, errors.New("Failed to uncache summoner.")
 		}
 	}
 

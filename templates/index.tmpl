@@ -1,5 +1,7 @@
 {{$displayName := index .session "displayName"}}
 {{$region := index .session "region"}}
+{{$team := index .session "team"}}
+{{$enemyTeam := index .session "enemyTeam"}}
 <html>
   {{template "header.tmpl"}}
 <body>
@@ -23,19 +25,19 @@
                 </tr>
               </thead>
               <tr>
-                <td><input name="blueTeamTop" id="blueTeamTop" class="form-control" placeholder="Top" value="Riot Heartwumbo"></input></td>
+                <td><input name="blueTeamTop" id="blueTeamTop" class="form-control" placeholder="Top" value="{{if $team}}{{index $team "top"}}{{else}}Riot Heartwumbo{{end}}"></input></td>
               </tr>
               <tr>
-                <td><input name="blueTeamJungle" id="blueTeamJungle" class="form-control" placeholder="Jungle" value="Riot Chomey"></input></td>
+                <td><input name="blueTeamJungle" id="blueTeamJungle" class="form-control" placeholder="Jungle" value="{{if $team}}{{index $team "jungle"}}{{else}}Riot Chomey{{end}}"></input></td>
               </tr>
               <tr>
-                <td><input name="blueTeamMid" id="blueTeamMid" class="form-control" placeholder="Mid" value="Riot Xelaadryth"></input></td>
+                <td><input name="blueTeamMid" id="blueTeamMid" class="form-control" placeholder="Mid" value="{{if $team}}{{index $team "mid"}}{{else}}Riot Xelaadryth{{end}}"></input></td>
               </tr>
               <tr>
-                <td><input name="blueTeamBottom" id="blueTeamBottom" class="form-control" placeholder="Bottom" value="Riot tehleach"></input></td>
+                <td><input name="blueTeamBottom" id="blueTeamBottom" class="form-control" placeholder="Bottom" value="{{if $team}}{{index $team "bottom"}}{{else}}Riot tehleach{{end}}"></input></td>
               </tr>
               <tr>
-                <td><input name="blueTeamSupport" id="blueTeamSupport" class="form-control" placeholder="Support" value="Tainze"></input></td>
+                <td><input name="blueTeamSupport" id="blueTeamSupport" class="form-control" placeholder="Support" value="{{if $team}}{{index $team "support"}}{{else}}Tainze{{end}}"></input></td>
               </tr>
             </table>
           </div>
@@ -47,19 +49,19 @@
                 </tr>
               </thead>
               <tr>
-                <td><input name="redTeamTop" id="redTeamTop" class="form-control" placeholder="Top" value="C9 Balls"></input></td>
+                <td><input name="redTeamTop" id="redTeamTop" class="form-control" placeholder="Top" value="{{if $enemyTeam}}{{index $enemyTeam "top"}}{{else}}C9 Balls{{end}}"></input></td>
               </tr>
               <tr>
-                <td><input name="redTeamJungle" id="redTeamJungle" class="form-control" placeholder="Jungle" value="C9 Meteos"></input></td>
+                <td><input name="redTeamJungle" id="redTeamJungle" class="form-control" placeholder="Jungle" value="{{if $enemyTeam}}{{index $enemyTeam "jungle"}}{{else}}C9 Meteos{{end}}"></input></td>
               </tr>
               <tr>
-                <td><input name="redTeamMid" id="redTeamMid" class="form-control" placeholder="Mid" value="Pobelter"></input></td>
+                <td><input name="redTeamMid" id="redTeamMid" class="form-control" placeholder="Mid" value="{{if $enemyTeam}}{{index $enemyTeam "mid"}}{{else}}Pobelter{{end}}"></input></td>
               </tr>
               <tr>
-                <td><input name="redTeamBottom" id="redTeamBottom" class="form-control" placeholder="Bottom" value="Doublelift"></input></td>
+                <td><input name="redTeamBottom" id="redTeamBottom" class="form-control" placeholder="Bottom" value="{{if $enemyTeam}}{{index $enemyTeam "bottom"}}{{else}}Doublelift{{end}}"></input></td>
               </tr>
               <tr>
-                <td><input name="redTeamSupport" id="redTeamSupport" class="form-control" placeholder="Support" value="Biofrost"></input></td>
+                <td><input name="redTeamSupport" id="redTeamSupport" class="form-control" placeholder="Support" value="{{if $enemyTeam}}{{index $enemyTeam "support"}}{{else}}Biofrost{{end}}"></input></td>
               </tr>
             </table>
           </div>
@@ -96,7 +98,7 @@
       <div class="col-md-6">
         <h3><span class="glyphicon glyphicon-wrench"></span> Next Steps</h3>
         <ul>
-          <li>Show current user's team on main page and match them against random teams (ORDER BY RAND() perhaps)</li>
+          <li>Prevent randomized opposing team from being the same as player team.</li>
           <li>Allow cross-region teams/matches</li>
           <li>Validator for valid regions</li>
           <li>Make a favicon</li>

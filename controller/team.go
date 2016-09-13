@@ -33,9 +33,78 @@ type RedTeamForm struct {
 	RedTeamSupport string `form:"redTeamSupport" binding:"required"`
 }
 
+//routeHome to home page
+func routeHome(c *gin.Context) {
+	session := sessions.Default(c)
+
+	var teams *[]database.FantasyTeam
+	var myTeams *[]database.FantasyTeam
+	//Requires at least 2 teams in the database
+	teams, err := database.GetRandomTeams(2)
+	if err != nil {
+		fmt.Println(err)
+		invalidHandler(c, http.StatusBadRequest, errors.New("Failed to pull 2 random teams from database."))
+		return
+	}
+	//Pick random teams from DB, add user's team if logged in
+	userID, err := validateSession(&session)
+	if err == nil {
+		myTeams, err = database.GetTeams(userID)
+		if err != nil {
+			fmt.Println(err)
+			invalidHandler(c, http.StatusBadRequest, errors.New("Failed to retrieve user team from database."))
+			return
+		}
+		if len(*myTeams) > 0 {
+			(*teams)[0] = (*myTeams)[0]
+		}
+	}
+
+	team := (*teams)[0]
+	enemyTeam := (*teams)[1]
+	//Convert summoner IDs to summoner names
+	cacheIDToSummoner, _ := fantasy.GetSummonersByCacheID(
+		team.Top,
+		team.Jungle,
+		team.Mid,
+		team.Bottom,
+		team.Support,
+	)
+	enemyCacheIDToSummoner, _ := fantasy.GetSummonersByCacheID(
+		enemyTeam.Top,
+		enemyTeam.Jungle,
+		enemyTeam.Mid,
+		enemyTeam.Bottom,
+		enemyTeam.Support,
+	)
+
+	//TODO: Region per player for this and team page
+	session.Set(sessionTeam, map[string]string{
+		sessionTop:     cacheIDToSummoner[team.Top].Name,
+		sessionJungle:  cacheIDToSummoner[team.Jungle].Name,
+		sessionMid:     cacheIDToSummoner[team.Mid].Name,
+		sessionBottom:  cacheIDToSummoner[team.Bottom].Name,
+		sessionSupport: cacheIDToSummoner[team.Support].Name,
+	})
+	session.Set(sessionEnemyTeam, map[string]string{
+		sessionTop:     enemyCacheIDToSummoner[enemyTeam.Top].Name,
+		sessionJungle:  enemyCacheIDToSummoner[enemyTeam.Jungle].Name,
+		sessionMid:     enemyCacheIDToSummoner[enemyTeam.Mid].Name,
+		sessionBottom:  enemyCacheIDToSummoner[enemyTeam.Bottom].Name,
+		sessionSupport: enemyCacheIDToSummoner[enemyTeam.Support].Name,
+	})
+
+	session.Set(sessionNavActive, "home")
+	sessionMap := sessionAsMap(&session)
+	c.HTML(http.StatusOK, "index.tmpl", gin.H{
+		sessionSession: *sessionMap,
+	})
+}
+
 func routeTeam(c *gin.Context) {
 	session := sessions.Default(c)
 
+	//Can't view this page unless the user is logged in
 	userID, err := validateSession(&session)
 	if err != nil {
 		c.Redirect(http.StatusFound, "/login")
@@ -43,7 +112,12 @@ func routeTeam(c *gin.Context) {
 	}
 
 	//Get the team from the DB
-	teams, _ := database.GetTeams(userID)
+	teams, err := database.GetTeams(userID)
+	if err != nil {
+		fmt.Println(err)
+		invalidHandler(c, http.StatusBadRequest, errors.New("Failed to retrieve team from database."))
+		return
+	}
 	//TODO: Be able to handle more than one team
 	if len(*teams) > 0 {
 		team := (*teams)[0]
