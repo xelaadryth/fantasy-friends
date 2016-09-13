@@ -90,7 +90,7 @@ func PreparePepper() error {
 // prepareUserStatements readies SQL queries for later use
 func prepareUserStatements(conn *pgx.Conn) error {
 	_, err := conn.Prepare(QueryGetUserAccountByUsername, `
-		SELECT id, hash FROM fantasy_friends.user_account WHERE username=$1
+		SELECT id, hash FROM fantasy_friends.user_account WHERE LOWER(username)=LOWER($1)
   `)
 	if err != nil {
 		return err
