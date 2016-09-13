@@ -1,7 +1,12 @@
 package database
 
 // prepareUserStatements readies SQL queries for later use
-import "github.com/jackc/pgx"
+import (
+	"errors"
+	"fmt"
+
+	"github.com/jackc/pgx"
+)
 
 //FantasyTeam contains the summoner IDs and meta information for a fantasy team
 type FantasyTeam struct {
@@ -18,10 +23,11 @@ type FantasyTeam struct {
 
 //Queries that are prepared for easy calling
 const (
-	QueryGetTeams   = "getTeams"
-	QueryInsertTeam = "insertTeam"
-	QueryUpdateTeam = "updateTeam"
-	QueryDeleteTeam = "deleteTeam"
+	QueryGetTeams       = "getTeams"
+	QueryGetRandomTeams = "getRandomTeams"
+	QueryInsertTeam     = "insertTeam"
+	QueryUpdateTeam     = "updateTeam"
+	QueryDeleteTeam     = "deleteTeam"
 )
 
 //GetTeams for the given user id from the database if they exist
@@ -48,6 +54,40 @@ func GetTeams(userID int64) (*[]FantasyTeam, error) {
 	}
 
 	return &teams, rows.Err()
+}
+
+//GetRandomTeams tries to retrieve numTeams non-bench fantasy teams from the DB
+func GetRandomTeams(numTeams int) (*[]FantasyTeam, error) {
+	//TODO: Update this if we expect more than 1 team per player in the future
+	teams := make([]FantasyTeam, numTeams, numTeams)
+	rows, _ := DBConnectionPool.Query(QueryGetRandomTeams, numTeams)
+
+	//This loop should never exceed numTeams due to the DB query's row limit
+	var i int
+	for i = 0; rows.Next(); i++ {
+		rows.Scan(
+			&(teams[i].ID),
+			&(teams[i].Owner),
+			&(teams[i].Name),
+			&(teams[i].Position),
+			&(teams[i].Top),
+			&(teams[i].Jungle),
+			&(teams[i].Mid),
+			&(teams[i].Bottom),
+			&(teams[i].Support),
+		)
+	}
+
+	dbError := rows.Err()
+	if dbError != nil {
+		return &teams, dbError
+	}
+
+	if i < numTeams {
+		return &teams, errors.New(fmt.Sprintf("Only %d teams found in database out of requested %d.", i, numTeams))
+	}
+
+	return &teams, nil
 }
 
 //AddTeam to database, errors if team already exists in that slot
@@ -103,8 +143,21 @@ func prepareTeamStatements(conn *pgx.Conn) error {
 	_, err := conn.Prepare(QueryGetTeams, `
 		SELECT id, owner, team_name, position, top, jungle, mid, bottom, support
 		FROM fantasy_friends.fantasy_team
-		WHERE owner=$1
+		WHERE owner=$1 AND position != 0
+		ORDER BY position
   `)
+	if err != nil {
+		return err
+	}
+
+	//O(nlog(n)) so could be improved, does not take teams in position 0 (reserved for bench)
+	_, err = conn.Prepare(QueryGetRandomTeams, `
+			SELECT id, owner, team_name, position, top, jungle, mid, bottom, support
+			FROM fantasy_friends.fantasy_team
+			WHERE position != 0
+			ORDER BY RANDOM()
+			LIMIT $1
+	  `)
 	if err != nil {
 		return err
 	}
