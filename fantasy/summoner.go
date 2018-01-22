@@ -4,101 +4,50 @@ import (
 	"errors"
 	"log"
 
-	"github.com/TrevorSStone/goriot"
 	"github.com/xelaadryth/fantasy-friends/database"
+	"github.com/xelaadryth/fantasy-friends/rgapi"
 )
 
-//NormalizeName using goriot to do just one name
-func NormalizeName(summonerName string) string {
-	summonerNames := make([]string, 1, 1)
-	summonerNames[0] = summonerName
-
-	normalizedSummonerNames := goriot.NormalizeSummonerName(summonerNames...)
-
-	return normalizedSummonerNames[0]
-}
-
-//GetSummonersByName from cache if available, otherwise grab from Riot API and cache them.
+//AccountIdsBySummonerName from cache if available, otherwise grab from Riot API and cache them.
 //Outputs a mapping of normalized summoner name to summoner objects
-func GetSummonersByName(region string, inputSummonerNames ...string) (map[string]goriot.Summoner, map[string]int64, error) {
-	summonerNames := goriot.NormalizeSummonerName(inputSummonerNames...)
-	nameToSummoner := make(map[string]goriot.Summoner)
-	nameToCacheID := make(map[string]int64)
-	var err error
-	//Try to uncache them first
-	for _, summonerName := range summonerNames {
-		nameToSummoner[summonerName], nameToCacheID[summonerName], err = database.UncacheSummonerByName(region, summonerName)
+func SummonersBySummonerName(region string, summonerNames ...string) ([]rgapi.Summoner, map[string]int64, error) {
+	summoners := make([]rgapi.Summoner, len(summonerNames))
+	cacheIds := make(map[string]int64)
+
+	for i, summonerName := range summonerNames {
+		//TODO: Save players with additional features, instead of in a cache
+		normalizedName := rgapi.NormalizeGameName(summonerName)
+
+		//Check for a cached value
+		summoner, cacheId, err := database.UncacheSummonerByName(region, normalizedName)
+		if err == nil {
+			summoners[i] = summoner
+			cacheIds[normalizedName] = cacheId
+			continue
+		}
+
+		//Not cached, call rgapi
+		summoner, err = rgapi.SummonerByName(region, normalizedName)
 		if err != nil {
-			break
+			return summoners, cacheIds, err
 		}
-	}
 
-	//Cache contained all of the summoner names, we're done
-	if len(nameToSummoner) == len(inputSummonerNames) && err == nil {
-		return nameToSummoner, nameToCacheID, nil
-	}
+		summoners[i] = summoner
 
-	//TODO: Move this into database in summoner_cache
-	//Either the cache didn't contain all of the ids or there are repeat IDs. Query Riot API next
-	nameToSummoner, err = goriot.SummonerByName(region, summonerNames...)
-	if err != nil || len(nameToSummoner) != len(inputSummonerNames) {
-		return nameToSummoner, nameToCacheID, errors.New("Duplicate or invalid summoner names.")
-	}
-
-	var cacheErr error
-	//Insert the results of the fresh query into the summoner cache
-	for normalizedName, summoner := range nameToSummoner {
-		nameToCacheID[normalizedName], cacheErr = database.CacheSummoner(region, normalizedName, summoner)
-		if cacheErr != nil {
-			log.Println("Failed to cache summoner", normalizedName, summoner, "with error", cacheErr)
-		}
-	}
-
-	return nameToSummoner, nameToCacheID, nil
-}
-
-//GetSummonersBySummonerID from cache if available, otherwise grab from Riot API and cache them
-func GetSummonersBySummonerID(region string, summonerIDs ...int64) (map[int64]goriot.Summoner, map[int64]int64, error) {
-	idToSummoner := make(map[int64]goriot.Summoner)
-	idToCacheID := make(map[int64]int64)
-	var err error
-	//Try to uncache them first
-	for _, summonerID := range summonerIDs {
-		idToSummoner[summonerID], idToCacheID[summonerID], err = database.UncacheSummonerBySummonerID(region, summonerID)
+		//Cache the value
+		cacheIds[normalizedName], err = database.CacheSummoner(region, normalizedName, summoner)
 		if err != nil {
-			break
+			log.Println("Failed to cache summoner", normalizedName, summoner, "with error", err)
 		}
 	}
 
-	//Cache contained all of the summoner IDs, we're done
-	if len(idToSummoner) == len(summonerIDs) && err == nil {
-		return idToSummoner, idToCacheID, nil
-	}
-
-	//TODO: Move this into database in summoner_cache
-	//Either the cache didn't contain all of the ids or there are repeat IDs. Query Riot API next
-	idToSummoner, err = goriot.SummonerByID(region, summonerIDs...)
-	if err != nil || len(idToSummoner) != len(summonerIDs) {
-		return idToSummoner, idToCacheID, errors.New("Duplicate or invalid summoner IDs.")
-	}
-
-	var cacheErr error
-	//Insert the results of the fresh query into the summoner cache
-	for _, summoner := range idToSummoner {
-		normalizedName := NormalizeName(summoner.Name)
-		idToCacheID[summoner.ID], cacheErr = database.CacheSummoner(region, normalizedName, summoner)
-		if cacheErr != nil {
-			log.Println("Failed to cache summoner", normalizedName, summoner, "with error", cacheErr)
-		}
-	}
-
-	return idToSummoner, idToCacheID, nil
+	return summoners, cacheIds, nil
 }
 
 //GetSummonersByCacheID if they exist, error otherwise. Should never error due to foreign key constraints unless
 //malicious users are messing around
-func GetSummonersByCacheID(summonerCacheIDs ...int64) (map[int64]goriot.Summoner, error) {
-	cacheIDToSummoner := make(map[int64]goriot.Summoner)
+func GetSummonersByCacheID(summonerCacheIDs ...int64) (map[int64]rgapi.Summoner, error) {
+	cacheIDToSummoner := make(map[int64]rgapi.Summoner)
 	var err error
 	//Try to uncache them first
 	for _, summonerCacheID := range summonerCacheIDs {

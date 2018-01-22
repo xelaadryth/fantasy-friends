@@ -4,15 +4,17 @@ package database
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/jackc/pgx"
 )
 
-//FantasyTeam contains the summoner IDs and meta information for a fantasy team
+//FantasyTeam contains the account IDs and meta information for a fantasy team
 type FantasyTeam struct {
 	ID       int64
 	Owner    int64
 	Name     string
+	Region   string
 	Position int
 	Top      int64
 	Jungle   int64
@@ -42,6 +44,7 @@ func GetTeams(userID int64) (*[]FantasyTeam, error) {
 			&(team.ID),
 			&(team.Owner),
 			&(team.Name),
+			&(team.Region),
 			&(team.Position),
 			&(team.Top),
 			&(team.Jungle),
@@ -69,6 +72,7 @@ func GetRandomTeams(numTeams int) (*[]FantasyTeam, error) {
 			&(teams[i].ID),
 			&(teams[i].Owner),
 			&(teams[i].Name),
+			&(teams[i].Region),
 			&(teams[i].Position),
 			&(teams[i].Top),
 			&(teams[i].Jungle),
@@ -91,13 +95,13 @@ func GetRandomTeams(numTeams int) (*[]FantasyTeam, error) {
 }
 
 //AddTeam to database, errors if team already exists in that slot
-func AddTeam(owner int64, teamName string, position int,
+func AddTeam(owner int64, teamName string, region string, position int,
 	top int64, jungle int64, mid int64, bottom int64, support int64) error {
-	//Get the cache IDs
 	_, err := DBConnectionPool.Exec(
 		QueryInsertTeam,
 		owner,
 		teamName,
+		strings.ToLower(region),
 		position,
 		top,
 		jungle,
@@ -110,7 +114,7 @@ func AddTeam(owner int64, teamName string, position int,
 }
 
 //UpdateTeam that already exists in the database
-func UpdateTeam(teamID int64, owner int64, teamName string, position int,
+func UpdateTeam(teamID int64, owner int64, teamName string, region string, position int,
 	top int64, jungle int64, mid int64, bottom int64, support int64) error {
 	//Get the cache IDs
 	_, err := DBConnectionPool.Exec(
@@ -118,6 +122,7 @@ func UpdateTeam(teamID int64, owner int64, teamName string, position int,
 		teamID,
 		owner,
 		teamName,
+		strings.ToLower(region),
 		position,
 		top,
 		jungle,
@@ -141,7 +146,7 @@ func DeleteTeam(teamID int64) error {
 
 func prepareTeamStatements(conn *pgx.Conn) error {
 	_, err := conn.Prepare(QueryGetTeams, `
-		SELECT id, owner, team_name, position, top, jungle, mid, bottom, support
+		SELECT id, owner, team_name, region, position, top, jungle, mid, bottom, support
 		FROM fantasy_friends.fantasy_team
 		WHERE owner=$1 AND position != 0
 		ORDER BY position
@@ -152,7 +157,7 @@ func prepareTeamStatements(conn *pgx.Conn) error {
 
 	//O(nlog(n)) so could be improved, does not take teams in position 0 (reserved for bench)
 	_, err = conn.Prepare(QueryGetRandomTeams, `
-			SELECT id, owner, team_name, position, top, jungle, mid, bottom, support
+			SELECT id, owner, team_name, region, position, top, jungle, mid, bottom, support
 			FROM fantasy_friends.fantasy_team
 			WHERE position != 0
 			ORDER BY RANDOM()
@@ -163,8 +168,8 @@ func prepareTeamStatements(conn *pgx.Conn) error {
 	}
 
 	_, err = conn.Prepare(QueryInsertTeam, `
-		INSERT INTO fantasy_friends.fantasy_team (owner, team_name, position, top, jungle, mid, bottom, support)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		INSERT INTO fantasy_friends.fantasy_team (owner, team_name, region, position, top, jungle, mid, bottom, support)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 	`)
 	if err != nil {
 		return err
@@ -172,7 +177,7 @@ func prepareTeamStatements(conn *pgx.Conn) error {
 
 	_, err = conn.Prepare(QueryUpdateTeam, `
 		UPDATE fantasy_friends.fantasy_team
-		SET (owner, team_name, position, top, jungle, mid, bottom, support) = ($2, $3, $4, $5, $6, $7, $8, $9)
+		SET (owner, team_name, region, position, top, jungle, mid, bottom, support) = ($2, $3, $4, $5, $6, $7, $8, $9, $10)
 		WHERE id = $1
 	`)
 

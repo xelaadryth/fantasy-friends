@@ -1,0 +1,5 @@
+# Environment variables that hold sensitive data that should not be shared
+.env
+.git/
+local.env
+prod.env

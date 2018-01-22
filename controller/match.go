@@ -8,7 +8,7 @@ import (
 	"github.com/xelaadryth/fantasy-friends/fantasy"
 )
 
-func playMatch(c *gin.Context) {
+func scrim(c *gin.Context) {
 	var blueTeamForm BlueTeamForm
 	var redTeamForm RedTeamForm
 	err := c.Bind(&blueTeamForm)
@@ -22,7 +22,7 @@ func playMatch(c *gin.Context) {
 		return
 	}
 
-	matchScore, err := fantasy.PlayMatch(
+	matchScore, err := fantasy.Scrim(
 		blueTeamForm.Region,
 		blueTeamForm.BlueTeamTop,
 		blueTeamForm.BlueTeamJungle,

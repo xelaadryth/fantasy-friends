@@ -91,14 +91,14 @@ func PreparePepper() error {
 // prepareUserStatements readies SQL queries for later use
 func prepareUserStatements(conn *pgx.Conn) error {
 	_, err := conn.Prepare(QueryGetUserAccountByUsername, `
-		SELECT id, hash FROM fantasy_friends.user_account WHERE username_lower=$1
+		SELECT id, hashed_password FROM fantasy_friends.user_account WHERE username_lower=$1
   `)
 	if err != nil {
 		return err
 	}
 
 	_, err = conn.Prepare(QueryPutUserAccount, `
-		INSERT INTO fantasy_friends.user_account (username, username_lower, hash)
+		INSERT INTO fantasy_friends.user_account (username, username_lower, hashed_password)
 		VALUES ($1, $2, $3)
 		RETURNING id
   `)

@@ -1,0 +1,17 @@
+version: '3'
+services:
+  web:
+    build: .
+    container_name: fantasy-web
+    depends_on:
+      - db
+    env_file: .env
+    image: xelaadryth/fantasy-friends:${VERSION}
+    ports:
+      - 0.0.0.0:8080:8080
+  db:
+    container_name: fantasy-db
+    env_file: .env
+    image: postgres:latest
+    ports:
+      - 0.0.0.0:5432:5432
