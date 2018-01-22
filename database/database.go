@@ -1,6 +1,7 @@
 package database
 
 import (
+	"crypto/tls"
 	"os"
 	"time"
 
@@ -8,38 +9,40 @@ import (
 )
 
 /*
-Currently the PostgreSQL database structure looks like so:
+Currently the PostgreSQL database structure looks like so (in this order):
 
 database_name (Database)
 	fantasy_friends (Schema)
 		user_account (Table)
 			id (bigserial - PK, NN)
-			username (varchar(32) - Unique, NN)
-			username_lower (varchar(32)) - Unique, NN)
-			hash (varchar(64) - NN)
+			username (text - Unique, NN)
+			username_lower (text - Unique, NN)
+			hashed_password (text - NN)
 		user_session (Table)
-			id (varchar(64) - PK, NN)
+			id (text - PK, NN)
 			user_id (bigint - NN, FK(user_account.id))
 			creation_time (bigint - NN)
-		summoner_cache (Table)
+		fantasy_players (Table)
 			id (bigserial - PK, NN)
-			summoner_id (bigint - NN, Unique with region)
-			summoner_name (varchar(32) - NN)
+			account_id (bigint - NN, Unique with region)
+			summoner_id (bignit - NN, Unique with region)
+			summoner_name (text - NN)
 			summoner_level (int - NN)
 			profile_icon_id (int - NN)
 			revision_date (bigint - NN)
-			normalized_name (varchar(32) - PK, NN)
-			region (varchar(8) - NN)
+			normalized_name (text - NN)
+			region (text - NN)
 		fantasy_team (Table)
 			id (bigserial - PK, NN)
 			owner (bigint - NN, FK(user_account.id))
-			team_name (varchar(32) - NN)
+			team_name (text - NN)
+			region (text - NN)
 			position (int - NN, Unique with owner)
-			top (bigint - FK(summoner_cache.id))
-			jungle (bigint - FK(summoner_cache.id))
-			mid (bigint - FK(summoner_cache.id))
-			bottom (bigint - FK(summoner_cache.id))
-			support (bigint - FK(summoner_cache.id))
+			top (bigint - FK(fantasy_player.id))
+			jungle (bigint - FK(fantasy_player.id))
+			mid (bigint - FK(fantasy_player.id))
+			bottom (bigint - FK(fantasy_player.id))
+			support (bigint - FK(fantasy_player.id))
 */
 
 //DBConnectionPool is required for making queries to the DB
@@ -58,12 +61,12 @@ func afterConnect(conn *pgx.Conn) error {
 		return err
 	}
 
-	err = prepareRiotStatements(conn)
+	err = prepareSessionStatements(conn)
 	if err != nil {
 		return err
 	}
 
-	err = prepareSessionStatements(conn)
+	err = preparePlayerStatements(conn)
 	if err != nil {
 		return err
 	}
@@ -78,12 +81,16 @@ func afterConnect(conn *pgx.Conn) error {
 
 //Connect to the database
 func Connect() error {
+
 	connPoolConfig := pgx.ConnPoolConfig{
 		ConnConfig: pgx.ConnConfig{
-			Host:     os.Getenv("DB_HOST"),
-			User:     os.Getenv("DB_USER"),
-			Password: os.Getenv("DB_PASSWORD"),
-			Database: os.Getenv("DB_DATABASE"),
+			Host:     os.Getenv("POSTGRES_HOST"),
+			User:     os.Getenv("POSTGRES_USER"),
+			Password: os.Getenv("POSTGRES_PASSWORD"),
+			Database: os.Getenv("POSTGRES_DB"),
+			TLSConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
 		},
 		MaxConnections: MaxDBConnections,
 		AfterConnect:   afterConnect,

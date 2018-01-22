@@ -72,7 +72,7 @@ func Route() {
 	//Fantasy ============================================================================================================
 	router.GET("/team", routeTeam)
 	router.POST("/team", saveTeam)
-	router.POST("/matchResults", playMatch)
+	router.POST("/matchResults", scrim)
 	//====================================================================================================================
 
 	router.Run(":" + port)

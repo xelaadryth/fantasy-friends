@@ -3,11 +3,12 @@ package main
 import (
 	"log"
 	"os"
+	"strconv"
 	"time"
 
-	"github.com/TrevorSStone/goriot"
 	"github.com/xelaadryth/fantasy-friends/controller"
 	"github.com/xelaadryth/fantasy-friends/database"
+	"github.com/xelaadryth/fantasy-friends/rgapi"
 )
 
 func main() {
@@ -16,12 +17,26 @@ func main() {
 	if riotAPIKey == "" {
 		log.Fatal("$RIOT_API_KEY must be set")
 	}
-	goriot.SetAPIKey(riotAPIKey)
-	goriot.SetSmallRateLimit(10, 10*time.Second)
-	goriot.SetLongRateLimit(500, 10*time.Minute)
+	rgapi.SetAPIKey(riotAPIKey)
+
+	// TODO: Make this configurable live
+	var shortLimit, longLimit int
+	var err error
+	shortLimit, err = strconv.Atoi(os.Getenv("SHORT_RATE_LIMIT"))
+	if err != nil {
+		log.Fatal("Unable to get the short rate limit")
+	} else {
+		rgapi.SetShortRateLimit(shortLimit, 10*time.Second)
+	}
+	longLimit, err = strconv.Atoi(os.Getenv("LONG_RATE_LIMIT"))
+	if err != nil {
+		log.Fatal("Unable to get the long rate limit")
+	} else {
+		rgapi.SetLongRateLimit(longLimit, 10*time.Minute)
+	}
 
 	//Set up DB
-	err := database.Connect()
+	err = database.Connect()
 	if err != nil {
 		log.Fatal(err.Error())
 	}

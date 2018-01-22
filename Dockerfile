@@ -1,16 +1,11 @@
-# Alpine linux is much smaller
-FROM alpine:latest
+FROM golang:1.9.2-alpine3.7
 
-# Install missing certificates for SSL
-RUN apk add --update ca-certificates
+# Install git
+RUN apk update && apk upgrade && apk add --no-cache bash git openssh
 
-# Push the statically-linked linux binary
-ADD alpine_binary /app/alpine_binary
+# Install app
+ADD . /go/src/github.com/xelaadryth/fantasy-friends
+WORKDIR /go/src/github.com/xelaadryth/fantasy-friends
+RUN go get && go install
 
-# Add file dependencies
-ADD static /app/static
-ADD templates /app/templates
-
-# Run the web server
-WORKDIR /app/
-CMD ./alpine_binary
+CMD go run fantasy-friends.go

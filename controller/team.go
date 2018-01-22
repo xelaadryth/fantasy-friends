@@ -1,16 +1,18 @@
 package controller
 
+//TODO: Re-do how we do teams, and let owners have their own instances of players
+//that can change and be modified, such as with "assists are worth 10% more points"
 import (
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/TrevorSStone/goriot"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/xelaadryth/fantasy-friends/database"
 	"github.com/xelaadryth/fantasy-friends/fantasy"
+	"github.com/xelaadryth/fantasy-friends/rgapi"
 )
 
 //BlueTeamForm input fields
@@ -43,7 +45,11 @@ func routeHome(c *gin.Context) {
 	teams, err := database.GetRandomTeams(2)
 	if err != nil {
 		fmt.Println(err)
-		invalidHandler(c, http.StatusBadRequest, errors.New("Failed to pull 2 random teams from database."))
+		session.Set(sessionNavActive, "home")
+		sessionMap := sessionAsMap(&session)
+		c.HTML(http.StatusOK, "index.tmpl", gin.H{
+			sessionSession: *sessionMap,
+		})
 		return
 	}
 	//Pick random teams from DB, add user's team if logged in
@@ -188,14 +194,14 @@ func saveTeam(c *gin.Context) {
 	}
 
 	//TODO: This should be kept on a per-player basis, not a per-user session basis
-	normalizedNames := goriot.NormalizeSummonerName(
+	normalizedNames := rgapi.NormalizeGameNames(
 		blueTeamForm.BlueTeamTop,
 		blueTeamForm.BlueTeamJungle,
 		blueTeamForm.BlueTeamMid,
 		blueTeamForm.BlueTeamBottom,
 		blueTeamForm.BlueTeamSupport,
 	)
-	_, nameToCacheID, err := fantasy.GetSummonersByName(blueTeamForm.Region, normalizedNames...)
+	_, nameToCacheID, err := fantasy.SummonersBySummonerName(blueTeamForm.Region, normalizedNames...)
 	if err != nil {
 		invalidHandler(c, http.StatusBadRequest, err)
 		return
@@ -214,6 +220,8 @@ func saveTeam(c *gin.Context) {
 			(*teams)[0].ID,
 			userID,
 			username+"'s Team",
+			//TODO: Get the correct region
+			"na",
 			1,
 			nameToCacheID[normalizedNames[0]],
 			nameToCacheID[normalizedNames[1]],
@@ -231,6 +239,8 @@ func saveTeam(c *gin.Context) {
 		err = database.AddTeam(
 			userID,
 			username+"'s Team",
+			//TODO: Get the correct region
+			"na",
 			1,
 			nameToCacheID[normalizedNames[0]],
 			nameToCacheID[normalizedNames[1]],
