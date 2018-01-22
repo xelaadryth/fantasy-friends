@@ -1,5 +1,7 @@
 # Fantasy Friends
 
+https://fantasy-friends.herokuapp.com/
+
 A League of Legends fantasy game where any summoner name can be used instead of just pro players.
 
 ## Setup
@@ -10,9 +12,8 @@ Note: This setup guide does not cover everything needed to set up this applicati
 3. Get a [Riot Developer API key](https://developer.riotgames.com/) from the official site.
 4. Set up a [PostgreSQL](https://www.postgresql.org/download/) database and set up tables as specified in the /database/database.go file.
 5. Set your environment settings in the environment file "```example.env```" and rename the file to "```.env```".
-6. Rename "example.env" to ".env" using: ```ren example.env .env```.
-7. Run ```build_run_local.bat``` to build to a Windows executable and run it directly to test.
-8. Run ```build_deploy_docker.bat``` to build to a Linux executable and deploy a local docker container to test.
-9. Set up Heroku dependencies (Toolbelt, linking your workspace to Heroku, etc.) and make sure they work.
-10. Set your production environment settings in Heroku's config variables.
-11. Run ```build_deploy_heroku.bat``` to build the Linux executable and deploy that to Heroku to host online.
+6. Make an account with [Heroku](https://www.heroku.com/) and install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
+7. Set up Heroku app and db and make sure they work.
+8. Set your production environment settings in Heroku's config variables.
+9. To run locally, run `make build` and `make run`
+10. To deploy to web, run `make deploy`
